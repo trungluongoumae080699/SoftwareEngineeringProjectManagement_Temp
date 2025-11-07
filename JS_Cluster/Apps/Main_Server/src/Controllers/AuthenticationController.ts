@@ -136,7 +136,7 @@ export const authenticateAdmin = async (request: CustomRequest<{}, {}, Request_D
     const passwordMatch = await bcrypt.compare(password, user.password)
     if (!passwordMatch) {
         return response.status(401).json({
-            message: "Email hoặc mật khẩu không đúng. Xin vui lòng thử lại"
+            message: "Email hoặc mật khẩu không đúng. Xin vui lòng thử lại..."
         })
     }
     const sessionObject: SessionObject = {

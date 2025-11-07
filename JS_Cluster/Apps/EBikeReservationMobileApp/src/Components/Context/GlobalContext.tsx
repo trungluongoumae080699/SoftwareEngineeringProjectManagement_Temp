@@ -13,6 +13,7 @@ type GlobalAppContextProps = {
 const GlobalAppContext = createContext<GlobalAppContextProps | undefined>(undefined)
 
 export const AppProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+  console.log("Setting Up Global Context...")
   const [pendingTrip, setPendingTrip] = useState<MobileAppTrip | null>(null);
   const [userProfile, setUserProfile] = useState<MobileAppCustomer | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null)
