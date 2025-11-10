@@ -7,8 +7,8 @@ export enum MobileAppBikeType {
 
 export type MobileAppBike = {
     id: string,
-    bikeType: MobileAppBikeType,
-    batteryStatus: number,
-    maximumSpeed: number,
-    maximumFunctionalDistance: number
+    bike_type: MobileAppBikeType,
+    battery_status: number,
+    maximum_speed: number,
+    maximum_functional_distance: number
 }

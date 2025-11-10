@@ -1,4 +1,4 @@
 export type Request_MobileAppForgetPasswordDTO = {
-    phoneNumber: string,
+    phone_number: string,
     password: string
 }

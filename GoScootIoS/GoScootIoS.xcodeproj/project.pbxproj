@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3F6444282EBFF3AB007806A3 /* MapboxMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 3F6444272EBFF3AB007806A3 /* MapboxMaps */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		3FFA53F02EBF2F0200668738 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -29,9 +33,22 @@
 		3FFA53F92EBF2F0200668738 /* GoScootIoSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoScootIoSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3FFA546E2EBF3AE900668738 /* Exceptions for "GoScootIoS" folder in "GoScootIoS" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 3FFA53DF2EBF2F0100668738 /* GoScootIoS */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3FFA53E22EBF2F0100668738 /* GoScootIoS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3FFA546E2EBF3AE900668738 /* Exceptions for "GoScootIoS" folder in "GoScootIoS" target */,
+			);
 			path = GoScootIoS;
 			sourceTree = "<group>";
 		};
@@ -52,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F6444282EBFF3AB007806A3 /* MapboxMaps in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +130,7 @@
 			);
 			name = GoScootIoS;
 			packageProductDependencies = (
+				3F6444272EBFF3AB007806A3 /* MapboxMaps */,
 			);
 			productName = GoScootIoS;
 			productReference = 3FFA53E02EBF2F0100668738 /* GoScootIoS.app */;
@@ -195,6 +214,9 @@
 			);
 			mainGroup = 3FFA53D72EBF2F0100668738;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3F6444262EBFF3AB007806A3 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3FFA53E12EBF2F0100668738 /* Products */;
 			projectDirPath = "";
@@ -398,6 +420,9 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GoScootIoS/Info.plist;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Ứng dụng cần quyền truy cập vị trí để định vị bạn ngay cả khi ứng dụng đang chạy nền.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Ứng dụng cần truy cập vị trí của bạn để hiển thị vị trí hiện tại trên bản đồ.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -442,6 +467,9 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GoScootIoS/Info.plist;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Ứng dụng cần quyền truy cập vị trí để định vị bạn ngay cả khi ứng dụng đang chạy nền.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Ứng dụng cần truy cập vị trí của bạn để hiển thị vị trí hiện tại trên bản đồ.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -615,6 +643,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3F6444262EBFF3AB007806A3 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mapbox/mapbox-maps-ios.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3F6444272EBFF3AB007806A3 /* MapboxMaps */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3F6444262EBFF3AB007806A3 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */;
+			productName = MapboxMaps;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3FFA53D82EBF2F0100668738 /* Project object */;
 }

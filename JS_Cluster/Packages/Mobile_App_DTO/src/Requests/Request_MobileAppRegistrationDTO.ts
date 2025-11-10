@@ -2,13 +2,13 @@ import * as z from 'zod'
 
 
 export const RegistrationRequestDTOSchema = z.object({
-  fullName: z
+  full_name: z
     .string()
     .min(2, "Họ tên phải có ít nhất 2 ký tự.")
     .max(50, "Họ tên không được vượt quá 50 ký tự.")
     .regex(/^[\p{L}\s'.-]+$/u, "Họ tên chứa ký tự không hợp lệ."),
 
-  phoneNumber: z
+  phone_number: z
     .string()
     .regex(/^(0|\+84)(\d{9})$/, "Số điện thoại không hợp lệ. Ví dụ: 0987654321 hoặc +84987654321."),
 

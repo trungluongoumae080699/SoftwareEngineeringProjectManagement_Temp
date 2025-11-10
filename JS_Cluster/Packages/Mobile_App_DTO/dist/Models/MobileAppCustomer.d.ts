@@ -1,5 +1,5 @@
 export type MobileAppCustomer = {
     "id": string;
-    fullName: string;
-    phoneNumber: string;
+    full_name: string;
+    phone_number: string;
 };

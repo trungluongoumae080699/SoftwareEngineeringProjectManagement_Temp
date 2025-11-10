@@ -1,5 +1,5 @@
 import * as z from 'zod';
 export const LogInRequestDTOSchema = z.object({
-    phoneNumber: z.string(),
+    phone_number: z.string(),
     password: z.string()
 });

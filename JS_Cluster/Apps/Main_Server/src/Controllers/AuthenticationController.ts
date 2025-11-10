@@ -6,9 +6,10 @@ import crypto from "crypto";
 import bcrypt from "bcrypt";
 import { getSession, LogInType, saveSession, SessionObject } from "../Repositories/RedisRepo/SessionRepo.js";
 import { LogInRequestDTOSchema, RegistrationRequestDTOSchema, Request_MobileAppLogInDTO, Request_MobileAppRegistrationDTO, Response_MobileAppLogInDTO } from "@trungthao/mobile_app_dto";
-import { AdminLogInRequestDTOSchema, Request_DashboardLogInDTO, Response_DashboardLogInDTO } from "@trungthao/admin_dashboard_dto";
+
 import { getStaffByEmail } from "../Repositories/MySqlRepo/StaffRepo.js";
 import { Customer } from "../Models/Customer.js";
+import { AdminLogInRequestDTOSchema, Request_DashboardLogInDTO, Response_DashboardLogInDTO } from "@trungthao/admin_dashboard_dto";
 
 export const authenticateCustomer = async (request: CustomRequest<{}, {}, Request_MobileAppLogInDTO>, response: Response, next: NextFunction) => {
     const parsed = LogInRequestDTOSchema.safeParse(request.body)
@@ -17,8 +18,8 @@ export const authenticateCustomer = async (request: CustomRequest<{}, {}, Reques
             message: "Dữ kiệu không chính xác, xin vui lòng thử lại"
         });
     }
-    const { phoneNumber, password } = parsed.data
-    const user = await getCustomerByPhoneNumber(phoneNumber)
+    const { phone_number, password } = parsed.data
+    const user = await getCustomerByPhoneNumber(phone_number)
     if (!user) {
         return response.status(401).json({
             message: "Số điện thoại hoặc mật khẩu không đúng. Xin vui lòng thử lại"
@@ -41,12 +42,12 @@ export const authenticateCustomer = async (request: CustomRequest<{}, {}, Reques
     await saveSession(sessionObject)
 
     const responseObject: Response_MobileAppLogInDTO = {
-        userProfile: {
+        user_profile: {
             id: user.id,
-            fullName: user.full_name,
-            phoneNumber: user.password
+            full_name: user.full_name,
+            phone_number: user.password
         },
-        sessionId: sessionObject._id
+        session_id: sessionObject._id
 
     }
     response.status(200).json(responseObject)
@@ -68,12 +69,12 @@ export const formlessAuthenticateCustomer = async (request: CustomRequest, respo
             const user: Customer | null = await getCustomerById(session.userId)
             if (user) {
                 const res: Response_MobileAppLogInDTO = {
-                    userProfile: {
+                    user_profile: {
                         id: user.id,
-                        fullName: user.full_name,
-                        phoneNumber: user.password
+                        full_name: user.full_name,
+                        phone_number: user.password
                     },
-                    sessionId: session._id
+                    session_id: session._id
                 }
                 response.status(200).json(res)
             } else {
@@ -99,7 +100,7 @@ export const registerCustomer = async (request: CustomRequest<{}, {}, Request_Mo
             message: firstError
         });
     }
-    const { fullName, phoneNumber, password } = parsed.data;
+    const { full_name, phone_number, password } = parsed.data;
 
     try {
         // 2) Hash password
@@ -107,10 +108,10 @@ export const registerCustomer = async (request: CustomRequest<{}, {}, Request_Mo
 
         // 3) Insert into DB
         const id = crypto.randomUUID();
-        await insertCustomer(id, fullName, phoneNumber, hashed);
+        await insertCustomer(id, full_name, phone_number, hashed);
 
         // 4) Created
-        return response.status(201).json({ id, fullName, phoneNumber });
+        return response.status(201).json({ id, full_name, phone_number });
     } catch (err: any) {
         // MySQL duplicate key error -> 409 Conflict
         if (err?.code === "ER_DUP_ENTRY") {
@@ -158,4 +159,4 @@ export const authenticateAdmin = async (request: CustomRequest<{}, {}, Request_D
 
     }
     response.status(200).json(responseObject)
-}
+} 

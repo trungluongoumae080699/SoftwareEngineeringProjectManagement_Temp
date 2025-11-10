@@ -1,4 +1,10 @@
 package com.example.goscootandroid.Models.DTOs.Responses
 
-class Response_FailureDTO {
-}
+import android.annotation.SuppressLint
+import kotlinx.serialization.Serializable
+
+@SuppressLint("UnsafeOptInUsageError")
+@Serializable
+data class ResponseFailureDTO(
+    val message: String
+)

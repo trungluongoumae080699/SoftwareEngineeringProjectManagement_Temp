@@ -1,5 +1,5 @@
 import express, { Router, Request, Response } from "express";
-import { authenticateAdmin, authenticateCustomer, formlessAuthenticateCustomer, registerCustomer } from "../../Controllers/AuthenticationController.js";
+import { authenticateCustomer, formlessAuthenticateCustomer, registerCustomer } from "../../Controllers/AuthenticationController.js";
 import { NextFunction } from "express-serve-static-core";
 import { CustomRequest } from "../../Middlewares/Authorization.js";
 

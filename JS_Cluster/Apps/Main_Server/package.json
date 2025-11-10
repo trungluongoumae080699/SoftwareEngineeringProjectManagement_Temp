@@ -21,7 +21,9 @@
     "express": "^5.0.0",
     "jsonwebtoken": "^9.0.0",
     "mysql2": "^3.11.0",
-    "redis": "^4.7.1"
+    "redis": "^4.7.1",
+    "@trungthao/mobile_app_dto": "*",
+    "@trungthao/admin_dashboard_dto": "*"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
