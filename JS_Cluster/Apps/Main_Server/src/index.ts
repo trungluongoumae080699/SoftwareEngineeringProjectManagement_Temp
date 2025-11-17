@@ -9,6 +9,9 @@ import { dashboardAuthenticationRouter } from "./Routes/DashboardRouters/Dashboa
 import { pool, query } from "./MySqlConfig.js";
 import { initRedis, redisClient } from "./RedisConfig.js";
 import { requestPreProcession } from "./Middlewares/RequestPreProcession.js";
+import { mobileAppNonAuthRouter } from "./Routes/MobileAppRouters/MobileAppNonAuthRouter.js";
+import { authorize } from "./Middlewares/Authorization.js";
+import { LogInType } from "./Repositories/RedisRepo/SessionRepo.js";
 
 
 const app: Application = express();
@@ -37,6 +40,7 @@ async function startServer() {
 
     app.use("/app/auth", mobileAppAuthenticationRouter);
     app.use("/dashboard/auth", dashboardAuthenticationRouter)
+    app.use("/app", authorize([LogInType.CUSTOMER]), mobileAppNonAuthRouter);
 
     /** 404 handler (no route matched) */
     app.use((req: Request, res: Response) => {

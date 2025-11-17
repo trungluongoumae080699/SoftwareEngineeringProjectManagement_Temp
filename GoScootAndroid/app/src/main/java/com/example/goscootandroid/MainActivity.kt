@@ -21,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.goscootandroid.Presentation.Components.Layouts.RootView
 import com.example.goscootandroid.Presentation.Components.Modules.MapModule
 import com.example.goscootandroid.Presentation.Screens.CameraScreen
+import com.example.goscootandroid.Presentation.Screens.EntryScreen
 
 import com.example.goscootandroid.Presentation.Screens.MapScreen
 import com.example.goscootandroid.Presentation.Screens.MyTrips
@@ -51,7 +52,7 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
         }
-        setContent { CameraScreen() }
+        setContent { RootView() }
     }
 }
 

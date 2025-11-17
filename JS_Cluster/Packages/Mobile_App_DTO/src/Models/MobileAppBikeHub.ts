@@ -8,7 +8,7 @@ export type MobileAppBikeHub = {
     id: string,
     longitude: number,
     latitude: number,
-    syncStatus: SyncStatus
+    address: string
 
     
 }

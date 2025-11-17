@@ -5,10 +5,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.goscootandroid.Models.DTOs.Responses.ResponseLogInDTO
+import com.example.goscootandroid.Models.DTOs.Responses.Response_TripDTO
 import com.example.goscootandroid.Models.Domains.Bike
 import com.example.goscootandroid.Models.Domains.BikeHub
 import com.example.goscootandroid.Models.Domains.Trip
 import com.example.goscootandroid.Models.Domains.TripStatus
+import com.example.goscootandroid.Repository.Retrofit.TripRepository
 import com.mapbox.maps.extension.style.expressions.dsl.generated.floor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,10 +22,12 @@ import javax.inject.Inject
 import kotlin.math.ceil
 
 @HiltViewModel
-class TripManagementViewModel @Inject constructor(): ViewModel() {
+class TripManagementViewModel @Inject constructor(
+    private val tripRepository: TripRepository
+): ViewModel() {
 
-    private val _trips = MutableStateFlow<List<Trip>>(listOf())
-    val trips: StateFlow<List<Trip>> = _trips
+    private val _trips = MutableStateFlow<List<Response_TripDTO>>(listOf())
+    val trips: StateFlow<List<Response_TripDTO>> = _trips
 
     private val _toFetchTrips = MutableStateFlow<Boolean>(true)
     val toFetchTrips: StateFlow<Boolean> = _toFetchTrips
@@ -47,8 +51,12 @@ class TripManagementViewModel @Inject constructor(): ViewModel() {
 
     suspend fun fetchTrips(
         context: Context,
+        sessionId: String
 
     ) {
+        val response = tripRepository.getTripByUser(_currentPage.value, sessionId)
+        _trips.value = response.trips
+        /*
         val json = context.assets.open("trips.json").bufferedReader().use(BufferedReader::readText)
         val result: List<Trip> = Json.decodeFromString(json)
         val numberOfPages = ceil(result.size / 10.0).toInt()
@@ -72,6 +80,8 @@ class TripManagementViewModel @Inject constructor(): ViewModel() {
         val end = currentPage.value * 10
         val origin = end - 10
         _trips.value = result.subList(origin, end)
+
+         */
 
 
     }

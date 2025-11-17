@@ -4,9 +4,108 @@ import { ResultSetHeader } from "mysql2/promise";
 import crypto from "crypto";
 import { Trip } from "../../Models/Trip.js";
 import { pool } from "../../MySqlConfig.js";
+import { Response_MyTripsListingDTO, Response_TripDTO } from "@trungthao/mobile_app_dto";
 
 
+export async function getMyTrips(
+    customer_id: string,
+    page: number
+): Promise<Response_MyTripsListingDTO> {
+    const LIMIT = 10;
+    const offset = (page - 1) * LIMIT;
 
+    // 1. Count total trips
+    const [countRows] = await pool.query(
+        `
+        SELECT COUNT(*) AS total
+        FROM trips
+        WHERE customer_id = ?
+          AND deleted = 0
+        `,
+        [customer_id]
+    );
+    const total = (countRows as any)[0].total as number;
+    const totalPages = Math.ceil(total / LIMIT);
+
+    // 2. Fetch page data (same query as before)
+    const [rows] = await pool.query(
+        `
+        SELECT
+            t.id,
+            t.bike_id,
+            t.customer_id,
+            t.trip_status,
+            t.reservation_expiry,
+            t.reservation_date,
+            t.trip_start_date,
+            t.trip_end_date,
+            t.trip_end_long,
+            t.trip_end_lat,
+            t.trip_secret,
+            t.isPaid,
+            t.price,
+
+            b.id AS bike_id2,
+            b.name,
+            b.maximum_speed,
+            b.maximum_functional_distance,
+
+            h.id AS hub_id,
+            h.longitude,
+            h.latitude,
+            h.address
+
+        FROM trips t
+        JOIN bikes b ON t.bike_id = b.id
+        JOIN hubs h ON t.hub_id = h.id
+
+        WHERE t.customer_id = ?
+          AND t.deleted = 0
+
+        ORDER BY t.reservation_date DESC
+        LIMIT ? OFFSET ?
+        `,
+        [customer_id, LIMIT, offset]
+    );
+
+    const trips: Response_TripDTO[] = (rows as any[]).map(r => ({
+        trip: {
+            id: r.id,
+            bike_id: r.bike_id,
+            customer_id: r.customer_id,
+            trip_status: r.trip_status,
+            reservation_date: Number(r.reservation_date),
+            reservation_expiry: Number(r.reservation_expiry),
+            trip_start_date: r.trip_start_date ? Number(r.trip_start_date) : undefined,
+            trip_end_date: r.trip_end_date ? Number(r.trip_end_date) : undefined,
+            trip_end_long: r.trip_end_long ?? undefined,
+            trip_end_lat: r.trip_end_lat ?? undefined,
+            trip_secret: r.trip_secret ?? undefined,
+            isPaid: r.isPaid,
+            price: r.price ?? undefined
+        },
+        bike: {
+            id: r.bike_id2,
+            name: r.name,
+            maximum_speed: r.maximum_speed,
+            maximum_functional_distance: r.maximum_functional_distance,
+        },
+        hub: {
+            id: r.hub_id,
+            longitude: r.longitude,
+            latitude: r.latitude,
+            address: r.address
+        },
+    }));
+
+    return {
+        trips,
+        total,
+        page,
+        pageSize: LIMIT,
+        totalPages,
+    };
+}
 
 export async function reserveBikeForCustomer(
   customerId: string,

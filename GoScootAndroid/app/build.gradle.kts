@@ -104,6 +104,20 @@ dependencies {
     implementation("androidx.camera:camera-video:1.3.4")
     implementation("androidx.camera:camera-view:1.3.4")
 
+    val room_version = "2.6.1" // latest stable
+
+    implementation("androidx.room:room-runtime:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")  // annotation processor
+
+    // Kotlin Extensions + Coroutines support
+    implementation("androidx.room:room-ktx:$room_version")
+
+    // If using Room with Paging
+    implementation("androidx.room:room-paging:$room_version")
+
+    // Optional: for testing
+    testImplementation("androidx.room:room-testing:$room_version")
+
 
 
 }

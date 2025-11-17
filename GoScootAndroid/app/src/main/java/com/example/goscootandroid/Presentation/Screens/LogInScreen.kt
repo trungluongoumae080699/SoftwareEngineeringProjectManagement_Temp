@@ -1,11 +1,8 @@
 package com.example.goscootandroid.Presentation.Screens
 import androidx.compose.runtime.Composable
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -16,13 +13,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.goscootandroid.EnvironmentObjects.LocalGlobalViewModelProvider
@@ -36,8 +30,8 @@ import com.example.goscootandroid.Presentation.ViewModel.GlobalViewModel
 import com.example.goscootandroid.Presentation.ViewModel.LogInScreenViewModel
 import com.example.goscootandroid.Presentation.ViewModel.SnackbarType
 import com.example.goscootandroid.R
-import com.example.goscootandroid.Repository.ApiError
-import com.example.goscootandroid.Repository.UnAuthorizedError
+import com.example.goscootandroid.Repository.Retrofit.ApiError
+import com.example.goscootandroid.Repository.Retrofit.UnAuthorizedError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -193,7 +187,7 @@ private fun onLoginSuccess(
             )
         }
         delay(2000)
-        globalVM.navigate(AppScreen.MAP, true)
+        globalVM.navigate(AppScreen.MY_TRIPS, true)
     }
 
 }

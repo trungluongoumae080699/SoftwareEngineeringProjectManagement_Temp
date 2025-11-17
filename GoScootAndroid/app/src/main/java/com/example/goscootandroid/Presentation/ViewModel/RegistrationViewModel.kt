@@ -1,11 +1,10 @@
 package com.example.goscootandroid.Presentation.ViewModel
 
-import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.goscootandroid.Models.DTOs.Requests.RequestRegistrationDTO
 import com.example.goscootandroid.Presentation.Components.Inputs.ValidationResult
-import com.example.goscootandroid.Repository.AuthenticationRepository
+import com.example.goscootandroid.Repository.Retrofit.AuthenticationRepository
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

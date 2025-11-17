@@ -10,6 +10,7 @@ import com.example.goscootandroid.Models.DTOs.Responses.ResponseLogInDTO
 import com.example.goscootandroid.Models.Domains.Bike
 import com.example.goscootandroid.Models.Domains.BikeHub
 import com.example.goscootandroid.Models.Domains.Destination
+import com.example.goscootandroid.Repository.Room.BikeHubDao
 import com.mapbox.search.autocomplete.PlaceAutocompleteSuggestion
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,9 @@ import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
-class MapScreenViewModel @Inject constructor(): ViewModel() {
+class MapScreenViewModel @Inject constructor(
+    private val bikeHubDao: BikeHubDao,
+): ViewModel() {
 
     private val _hubList = MutableStateFlow<List<BikeHub>>(listOf())
     val hubList: StateFlow<List<BikeHub>> = _hubList
@@ -68,18 +71,10 @@ class MapScreenViewModel @Inject constructor(): ViewModel() {
 
 
 
-    fun fetchBikeHubAsync(
+    suspend fun fetchBikeHubAsync(
         context: Context,
-
-        //onSuccess: (ResponseLogInDTO) -> Unit,
-        //onError: (Throwable) -> Unit
         ) {
-        viewModelScope.launch {
-            val json = context.assets.open("bike_hubs.json").bufferedReader().use(BufferedReader::readText)
-            _hubList.value = Json.decodeFromString(json)
-            Log.d("Hubs", "${_hubList.value.size}")
-
-        }
+        _hubList.value = bikeHubDao.getAll()
     }
 
     fun fetchBikeListAsync(

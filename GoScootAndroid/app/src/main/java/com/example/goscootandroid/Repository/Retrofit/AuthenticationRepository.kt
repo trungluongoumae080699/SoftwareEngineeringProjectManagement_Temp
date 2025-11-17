@@ -1,6 +1,5 @@
-package com.example.goscootandroid.Repository
+package com.example.goscootandroid.Repository.Retrofit
 
-import android.annotation.SuppressLint
 import android.util.Log
 import com.example.goscootandroid.EnvironmentObjects.GoScootApi
 import com.example.goscootandroid.Models.DTOs.Requests.RequestLogInDTO

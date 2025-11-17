@@ -1,9 +1,7 @@
-package com.example.goscootandroid.Repository
+package com.example.goscootandroid.Repository.Retrofit
 
 import android.annotation.SuppressLint
 import kotlinx.serialization.Serializable
-import okhttp3.Interceptor
-import okhttp3.HttpUrl.Companion.toHttpUrl
 
 
 @SuppressLint("UnsafeOptInUsageError")

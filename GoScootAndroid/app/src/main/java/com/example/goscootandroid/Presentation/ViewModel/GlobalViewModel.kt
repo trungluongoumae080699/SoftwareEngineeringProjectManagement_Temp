@@ -1,35 +1,37 @@
 package com.example.goscootandroid.Presentation.ViewModel
-import android.annotation.SuppressLint
-import android.app.Application
 import android.content.Context
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTimeFilled
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.graphics.Color
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.goscootandroid.EnvironmentObjects.SessionKeys
+import com.example.goscootandroid.EnvironmentObjects.SessionKeys.PERSIST_HUB_JSON
 import com.example.goscootandroid.EnvironmentObjects.dataStore
-import com.example.goscootandroid.Models.DTOs.Responses.ResponseLogInDTO
+import com.example.goscootandroid.Models.Domains.BikeHub
 import com.example.goscootandroid.Models.Domains.Customer
-import com.example.goscootandroid.Models.Domains.Destination
-import com.example.goscootandroid.Repository.AuthenticationRepository
-import com.example.goscootandroid.Repository.IgnorableError
-import dagger.hilt.android.internal.Contexts.getApplication
+import com.example.goscootandroid.Repository.Retrofit.AuthenticationRepository
+import com.example.goscootandroid.Repository.Retrofit.IgnorableError
+import com.example.goscootandroid.Repository.Room.BikeHubDao
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
+
+
 
 /* ---------- Navigation Destinations ---------- */
 enum class AppScreen {
@@ -72,6 +74,7 @@ sealed class NavEvent {
 /* ---------- ViewModel ---------- */
 @HiltViewModel
 class GlobalViewModel @Inject constructor(
+    private val bikeHubDao: BikeHubDao,
     private val authRepo: AuthenticationRepository
 ) : ViewModel() {
 
@@ -97,11 +100,46 @@ class GlobalViewModel @Inject constructor(
         _sessionId.value = sessionId
     }
 
-
-
     // For simplicity, you can store a Trip model later here
     private val _reservedTrip = MutableStateFlow<Any?>(null)
     val reservedTrip: StateFlow<Any?> = _reservedTrip
+
+    private val _finishedPersistingHubJson = MutableStateFlow<Boolean>(false)
+    val finishedPersistingHubJson: StateFlow<Boolean> = _finishedPersistingHubJson
+
+    suspend  fun persistHubFromJson(context: Context) {
+        val alreadyPersisted = context.dataStore.data
+            .map { it[PERSIST_HUB_JSON] ?: false }
+            .first()
+
+        if (alreadyPersisted) {
+            println("✅ Hubs already persisted — skip loading.")
+            return
+        }
+        val jsonString = withContext(Dispatchers.IO) {
+            context.assets.open("hubs.json").bufferedReader().use { it.readText() }
+        }
+
+        // 3️⃣ Deserialize JSON → List<BikeHub>
+        val json = Json {
+            ignoreUnknownKeys = true
+        }
+
+        val hubs: List<BikeHub> = json.decodeFromString(jsonString)
+
+        // 4️⃣ Insert into Room (replace all)
+        bikeHubDao.insertAll(hubs)
+        println("🚀 Inserted ${hubs.size} hubs into Room database.")
+
+        // 5️⃣ Persist flag to DataStore
+        context.dataStore.edit { prefs ->
+            prefs[PERSIST_HUB_JSON] = true
+        }
+        _finishedPersistingHubJson.value = true
+        println("🔒 DataStore flag updated → persist_hub_json = true")
+
+
+    }
 
     /* -------- Navigation -------- */
     fun navigate(to: AppScreen, toClearStack: Boolean) {
@@ -124,37 +162,25 @@ class GlobalViewModel @Inject constructor(
     fun updateSnackBarType(type: SnackbarType){
         _snackbarType.value = type
     }
+
+
+
     /* -------- Session-based Login -------- */
-    fun logInBySessionId(
+    suspend fun logInBySessionId(
         context: Context,
-        onSuccess: (ResponseLogInDTO) -> Unit,
-        onError: (Throwable) -> Unit
     ) {
-        viewModelScope.launch {
-            try {
-                // 1) Read sessionId from DataStore
-                val sessionId = context.dataStore.data
-                    .map { prefs -> prefs[SessionKeys.SESSION_ID] }
-                    .firstOrNull()
+        val sessionId = context.dataStore.data
+            .map { prefs -> prefs[SessionKeys.SESSION_ID] }
+            .firstOrNull()
 
-                if (sessionId.isNullOrBlank()) {
-                    onError(IgnorableError("No stored session id"))
-                    return@launch
-                }
-
-                // 2) Call API
-                val resp = authRepo.logInWithSessionId(sessionId)
-
-                // 3) Update state
-                _profile.value = resp.user_profile
-                _sessionId.value = resp.session_id
-
-                // 4) Callback
-                onSuccess(resp)
-            } catch (t: Throwable) {
-                onError(t)
-            }
+        if (sessionId.isNullOrBlank()) {
+            throw IgnorableError("Missing session id")
         }
+        // 2) Call API
+        val resp = authRepo.logInWithSessionId(sessionId)
+        // 3) Update state
+        _profile.value = resp.user_profile
+        _sessionId.value = resp.session_id
     }
 
     /* -------- Session Persistence -------- */

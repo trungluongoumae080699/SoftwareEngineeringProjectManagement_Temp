@@ -15,15 +15,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,7 +31,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -52,10 +47,8 @@ import com.example.goscootandroid.Presentation.Components.Inputs.BrandButton
 import com.example.goscootandroid.Presentation.Components.Modules.Cards.TripCard
 import com.example.goscootandroid.Presentation.ViewModel.SnackbarType
 import com.example.goscootandroid.Presentation.ViewModel.TripManagementViewModel
-import com.example.goscootandroid.Repository.ApiError
-import com.example.goscootandroid.Repository.UnAuthorizedError
-import com.mapbox.maps.extension.style.expressions.dsl.generated.mod
-import com.mapbox.maps.extension.style.sources.generated.vectorSource
+import com.example.goscootandroid.Repository.Retrofit.ApiError
+import com.example.goscootandroid.Repository.Retrofit.UnAuthorizedError
 import kotlinx.coroutines.launch
 
 @Preview
@@ -63,6 +56,8 @@ import kotlinx.coroutines.launch
 fun MyTrips(
     vm: TripManagementViewModel = hiltViewModel(),
 ){
+    val globalVM = LocalGlobalViewModelProvider.current
+    val sessionId by globalVM.sessionId.collectAsState()
     val trips by vm.trips.collectAsState()
     val pageGroup by vm.pageGroup.collectAsState()
     val currentPage by vm.currentPage.collectAsState()
@@ -70,14 +65,15 @@ fun MyTrips(
     val pageGroupIndex by vm.currentPageGroupIndex.collectAsState()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
-    val globalVM = LocalGlobalViewModelProvider.current
+
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(toFetchTrips) {
         if (toFetchTrips){
             try {
                 vm.fetchTrips(
-                    context
+                    context,
+                    sessionId as String
                 )
             } catch (err: Error){
                 val msg = when (err) {
@@ -143,7 +139,7 @@ fun MyTrips(
             }
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.weight(1f)){
-                items(trips, key = {it.id}){
+                items(trips, key = {it.trip.id}){
                     trip -> TripCard(trip) { }
                 }
             }

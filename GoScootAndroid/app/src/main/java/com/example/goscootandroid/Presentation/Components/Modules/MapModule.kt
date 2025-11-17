@@ -351,7 +351,7 @@ fun MapModule(
 
         if (!cameraFollowMode.value){
             Row(modifier = Modifier
-                .width(120.dp)
+                .width(130.dp)
                 .align(Alignment.BottomStart)
                 .offset(x = 5.dp, y = -30.dp)
             ){

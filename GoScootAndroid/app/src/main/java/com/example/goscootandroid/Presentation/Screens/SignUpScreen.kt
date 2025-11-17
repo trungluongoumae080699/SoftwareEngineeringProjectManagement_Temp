@@ -39,13 +39,12 @@ import com.example.goscootandroid.Presentation.Components.Inputs.BrandButton
 import com.example.goscootandroid.Presentation.Components.Inputs.HyperLink
 import com.example.goscootandroid.Presentation.Components.Inputs.InputField
 import com.example.goscootandroid.Presentation.Components.Modules.AppSnackbarHost
-import com.example.goscootandroid.Presentation.ViewModel.AppScreen
 import com.example.goscootandroid.Presentation.ViewModel.GlobalViewModel
 import com.example.goscootandroid.Presentation.ViewModel.RegistrationScreenViewModel
 import com.example.goscootandroid.Presentation.ViewModel.SnackbarType
 import com.example.goscootandroid.R
-import com.example.goscootandroid.Repository.ApiError
-import com.example.goscootandroid.Repository.UnAuthorizedError
+import com.example.goscootandroid.Repository.Retrofit.ApiError
+import com.example.goscootandroid.Repository.Retrofit.UnAuthorizedError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

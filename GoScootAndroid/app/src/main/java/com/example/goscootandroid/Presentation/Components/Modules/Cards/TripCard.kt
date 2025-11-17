@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.goscootandroid.Models.DTOs.Responses.Response_TripDTO
 import com.example.goscootandroid.Models.Domains.Trip
 import com.example.goscootandroid.Models.Domains.TripStatus
 import com.example.goscootandroid.Presentation.Screens.MyTrips
@@ -39,13 +40,13 @@ import com.example.goscootandroid.Utility.formatDateTime
 
 @Composable
 fun TripCard(
-    trip: Trip,
+    trip: Response_TripDTO,
     onClick: () -> Unit
 ){
     val interaction = remember { MutableInteractionSource() }
     val isPressed by interaction.collectIsPressedAsState()
 
-    val statusColor = when (trip.trip_status) {
+    val statusColor = when (trip.trip.trip_status) {
         TripStatus.COMPLETE   -> Color.Green
         TripStatus.CANCELLED  -> Color.Red
         TripStatus.PENDING    -> Color.Yellow
@@ -76,7 +77,7 @@ fun TripCard(
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ){
-                val reservation_date_time = formatDateTime(trip.reservation_date)
+                val reservation_date_time = formatDateTime(trip.trip.reservation_date)
                 Row(verticalAlignment = Alignment.CenterVertically){
                     Icon(imageVector = Icons.Filled.Event, contentDescription = null, tint = Color(0xFFDF6C20))
                     Spacer(modifier = Modifier.width(10.dp))
@@ -97,7 +98,7 @@ fun TripCard(
             }
 
         }
-        Text(trip.id,
+        Text(trip.trip.id,
             style = MaterialTheme.typography.bodySmall.copy(
             color = Color(0xFF757575),
             fontWeight = FontWeight.W400
@@ -105,7 +106,7 @@ fun TripCard(
             modifier = Modifier.align(Alignment.TopEnd).offset(x = -10.dp, y = 10.dp))
 
         Text(
-            trip.trip_status.value,
+            trip.trip.trip_status.value,
             style = MaterialTheme.typography.bodySmall.copy(
                 fontWeight = FontWeight.W600
             ),

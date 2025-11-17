@@ -66,7 +66,7 @@ fun RootView() {
                 .fillMaxSize()
                 .background(Color.White)) {
                 // Navigation host (like NavigationStack in SwiftUI)
-                TripDetailScreen()
+                AppNavHost(nav, snackbarHostState)
 
                 // If you want an always-on overlay (bottom tabs, sheets, etc.), add here
                 // e.g. BottomBar(), NotificationSheet(), etc.

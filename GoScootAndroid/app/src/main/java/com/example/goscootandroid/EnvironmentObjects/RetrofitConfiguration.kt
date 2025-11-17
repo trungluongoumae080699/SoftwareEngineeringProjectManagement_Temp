@@ -3,6 +3,7 @@ package com.example.goscootandroid.EnvironmentObjects
 import com.example.goscootandroid.Models.DTOs.Requests.RequestLogInDTO
 import com.example.goscootandroid.Models.DTOs.Requests.RequestRegistrationDTO
 import com.example.goscootandroid.Models.DTOs.Responses.ResponseLogInDTO
+import com.example.goscootandroid.Models.DTOs.Responses.Response_MyTripsDTO
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -18,6 +19,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Query
 import javax.inject.Singleton
 
 @Module
@@ -95,6 +97,8 @@ object ApiPaths {
     const val LOGIN = "auth/signIn"
     const val LOGIN_VIA_SESSION = "auth/signIn/session"
     const val REGISTER = "auth/signUp"
+
+    const val MY_TRIPS = "trips"
 }
 
 /* =========================
@@ -118,4 +122,10 @@ interface GoScootApi {
     suspend fun register(
         @Body body: RequestRegistrationDTO
     ): Unit
+
+    @GET(ApiPaths.MY_TRIPS)
+    suspend fun fetchMyTrips(
+        @Query("page") page: Int,
+        @Header("authorization") sessionId: String
+    ): Response_MyTripsDTO
 }
