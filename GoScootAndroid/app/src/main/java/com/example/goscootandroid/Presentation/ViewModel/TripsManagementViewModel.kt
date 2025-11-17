@@ -25,8 +25,19 @@ class TripManagementViewModel @Inject constructor(): ViewModel() {
     private val _trips = MutableStateFlow<List<Trip>>(listOf())
     val trips: StateFlow<List<Trip>> = _trips
 
+    private val _toFetchTrips = MutableStateFlow<Boolean>(true)
+    val toFetchTrips: StateFlow<Boolean> = _toFetchTrips
+
+    fun updateToFetchTrips(state: Boolean){
+        _toFetchTrips.value = state
+    }
+
     private val _currentPage = MutableStateFlow<Int>(1)
-    val page: StateFlow<Int> = _currentPage
+    val currentPage: StateFlow<Int> = _currentPage
+
+    fun updateCurrentPage(page: Int){
+        _currentPage.value = page
+    }
 
     private val _currentPageGroupIndex = MutableStateFlow<Int>(0)
     val currentPageGroupIndex: StateFlow<Int> = _currentPageGroupIndex
@@ -36,36 +47,31 @@ class TripManagementViewModel @Inject constructor(): ViewModel() {
 
     suspend fun fetchTrips(
         context: Context,
-        onSuccess: () -> Unit,
-        onError: (Throwable) -> Unit
+
     ) {
-        try {
-            val json = context.assets.open("trips.json").bufferedReader().use(BufferedReader::readText)
-            val result: List<Trip> = Json.decodeFromString(json)
-            val numberOfPages = ceil(result.size / 10.0).toInt()
+        val json = context.assets.open("trips.json").bufferedReader().use(BufferedReader::readText)
+        val result: List<Trip> = Json.decodeFromString(json)
+        val numberOfPages = ceil(result.size / 10.0).toInt()
 
-            val groups = mutableListOf<List<Int>>()
-            var current = mutableListOf<Int>()
+        val groups = mutableListOf<List<Int>>()
+        var current = mutableListOf<Int>()
 
-            for (page in 1..numberOfPages) {
-                current.add(page)
+        for (page in 1..numberOfPages) {
+            current.add(page)
 
-                if (current.size == 5) {
-                    groups.add(current.toList())
-                    current = mutableListOf()
-                }
-            }
-
-            if (current.isNotEmpty()) {
+            if (current.size == 5) {
                 groups.add(current.toList())
+                current = mutableListOf()
             }
-            _pageGroup.value = groups
-            val end = page.value * 10
-            val origin = end - 10
-            _trips.value = result.subList(origin, end)
-        } catch (err: Error){
-            onError(err)
         }
+
+        if (current.isNotEmpty()) {
+            groups.add(current.toList())
+        }
+        _pageGroup.value = groups
+        val end = currentPage.value * 10
+        val origin = end - 10
+        _trips.value = result.subList(origin, end)
 
 
     }

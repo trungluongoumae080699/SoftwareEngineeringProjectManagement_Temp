@@ -5,5 +5,5 @@ export interface Customer extends RowDataPacket {
     full_name: string,
     phone_number: string,
     password: string,
-    created_at: number,
+    created_at: Date,
 }

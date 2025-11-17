@@ -10,5 +10,5 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*", "src/scripts/initDatabase.ts"]
+  "include": ["src/**/*", "src/scripts/sql_migration/initDatabase.ts"]
 }

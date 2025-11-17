@@ -28,12 +28,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,11 +47,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.goscootandroid.EnvironmentObjects.LocalGlobalViewModelProvider
 import com.example.goscootandroid.Presentation.Components.Inputs.BrandButton
 import com.example.goscootandroid.Presentation.Components.Modules.Cards.TripCard
+import com.example.goscootandroid.Presentation.ViewModel.SnackbarType
 import com.example.goscootandroid.Presentation.ViewModel.TripManagementViewModel
+import com.example.goscootandroid.Repository.ApiError
+import com.example.goscootandroid.Repository.UnAuthorizedError
 import com.mapbox.maps.extension.style.expressions.dsl.generated.mod
 import com.mapbox.maps.extension.style.sources.generated.vectorSource
+import kotlinx.coroutines.launch
 
 @Preview
 @Composable
@@ -56,15 +65,46 @@ fun MyTrips(
 ){
     val trips by vm.trips.collectAsState()
     val pageGroup by vm.pageGroup.collectAsState()
-    val page by vm.pageGroup.collectAsState()
+    val currentPage by vm.currentPage.collectAsState()
+    val toFetchTrips by vm.toFetchTrips.collectAsState()
     val pageGroupIndex by vm.currentPageGroupIndex.collectAsState()
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val globalVM = LocalGlobalViewModelProvider.current
+    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-        vm.fetchTrips(
-            context,
-            onError = {err -> print(err)},
-            onSuccess = {})
+    LaunchedEffect(toFetchTrips) {
+        if (toFetchTrips){
+            try {
+                vm.fetchTrips(
+                    context
+                )
+            } catch (err: Error){
+                val msg = when (err) {
+                    is UnAuthorizedError -> err.msg
+                    is ApiError -> err.messageText
+                    else -> "Đã xảy ra lỗi. Xin vui lòng thử lại"
+                }
+
+                scope.launch {
+                    globalVM.updateSnackBarType(SnackbarType.Error)
+                    scope.launch {
+                        launch {
+                            snackbarHostState.showSnackbar(
+                                message = msg,
+                                withDismissAction = true,
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+
+                    }
+                }
+            } finally {
+                vm.updateToFetchTrips(false)
+            }
+        }
+
+
     }
     Scaffold(modifier = Modifier.background(Color.White)) {
             padding ->
@@ -130,8 +170,12 @@ fun MyTrips(
                 LazyRow {
                     items(pageGroup[pageGroupIndex], key = { it }) { page ->
                         IconButton(
-                            onClick = { /* your logic */ },
-                            modifier = Modifier.size(30.dp).background(Color(0xFFDF6C20)).padding(0.dp)
+                            onClick = {
+                                vm.updateCurrentPage(page)
+                                vm.updateToFetchTrips(true)
+                            },
+                            modifier = Modifier.size(30.dp).background(Color(0xFFDF6C20)).padding(0.dp),
+                            enabled = currentPage != page
                         ) {
                             Text(
                                 text = "$page",

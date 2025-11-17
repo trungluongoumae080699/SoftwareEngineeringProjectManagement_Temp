@@ -11,9 +11,26 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "node --test",
-    "db:init": "ts-node --esm -r dotenv/config src/scripts/initDatabase.ts dotenv_config_path=.env.admin"
+    "db:init": "ts-node --esm -r dotenv/config src/scripts/sql_migration/initDatabase.ts dotenv_config_path=.env.admin",
+    "db:modi_01": "ts-node --esm src/scripts/sql_migration/database_modi_01.ts",
+    "db:modi_02": "ts-node --esm src/scripts/sql_migration/database_modi_02.ts",
+    "db:insert_hubs": "ts-node --esm src/scripts/sql_migration/insert_hubs.ts",
+    "db:insert_bikes": "ts-node --esm src/scripts/sql_migration/insert_bikes.ts",
+    "db:insert_staff": "ts-node --esm src/scripts/sql_migration/insert_staff.ts",
+    "db:insert_customers": "ts-node --esm src/scripts/sql_migration/insert_customers.ts",
+    "db:insert_trips": "ts-node --esm src/scripts/sql_migration/insert_trips.ts",
+    "hub:gen": "ts-node --esm src/scripts/json_sample_data_gen/create_hubs_json.ts",
+    "bike:gen": "ts-node --esm src/scripts/json_sample_data_gen/create_bikes_json.ts",
+    "staff:gen": "ts-node --esm src/scripts/json_sample_data_gen/create_staff_json.ts",
+    "customer:gen": "ts-node --esm src/scripts/json_sample_data_gen/create_customers_json.ts",
+    "trip:gen": "ts-node --esm src/scripts/json_sample_data_gen/create_trips_json.ts",
+    "db:all": "npm run hub:gen && npm run bike:gen && npm run staff:gen && npm run customer:gen && npm run trip:gen && npm run db:init && npm run db:modi_01 && npm run db:modi_02 && npm run db:insert_hubs && npm run db:insert_bikes && npm run db:insert_staff && npm run db:insert_customers && npm run db:insert_trips"
+
   },
   "dependencies": {
+    "@faker-js/faker": "^10.1.0",
+    "@trungthao/admin_dashboard_dto": "*",
+    "@trungthao/mobile_app_dto": "*",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -21,9 +38,7 @@
     "express": "^5.0.0",
     "jsonwebtoken": "^9.0.0",
     "mysql2": "^3.11.0",
-    "redis": "^4.7.1",
-    "@trungthao/mobile_app_dto": "*",
-    "@trungthao/admin_dashboard_dto": "*"
+    "redis": "^4.7.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

@@ -5,5 +5,5 @@ export interface Staff extends RowDataPacket {
     full_name: string,
     email: string,
     password: string,
-    created_at: string
+    created_at: Date
 }

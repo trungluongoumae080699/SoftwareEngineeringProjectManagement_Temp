@@ -1,10 +1,11 @@
 import { RowDataPacket } from "mysql2";
 
 export enum BikeStatus {
-    IDLE = "idle",
-    RESERVED = "reserved",
-    INUSE = "inuse"
+    IDLE = "Idle",
+    RESERVED = "Reserved",
+    INUSE = "Inuse"
 }
+
 export interface Bike extends RowDataPacket {
     id: string,
     status: BikeStatus,
@@ -12,5 +13,7 @@ export interface Bike extends RowDataPacket {
     maximum_functional_distance: number,
     purchase_date: number,
     last_service_date: number,
-    current_hub: string
+    current_hub?: string | null,
+    deleted: boolean,
+    created_at: Date
 }
