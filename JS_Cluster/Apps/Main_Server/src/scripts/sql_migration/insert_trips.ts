@@ -157,12 +157,7 @@ async function main() {
       );
       return;
     }
-    if (alreadyRun){
-        console.log(
-        `Script has already been executed`
-      );
-      return;
-    }
+ 
 
     await insertTripsFromJsonBulk();
 

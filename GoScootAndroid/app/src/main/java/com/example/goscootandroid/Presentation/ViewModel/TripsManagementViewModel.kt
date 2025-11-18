@@ -56,11 +56,7 @@ class TripManagementViewModel @Inject constructor(
     ) {
         val response = tripRepository.getTripByUser(_currentPage.value, sessionId)
         _trips.value = response.trips
-        /*
-        val json = context.assets.open("trips.json").bufferedReader().use(BufferedReader::readText)
-        val result: List<Trip> = Json.decodeFromString(json)
-        val numberOfPages = ceil(result.size / 10.0).toInt()
-
+        val numberOfPages = ceil(response.total / 10.0).toInt()
         val groups = mutableListOf<List<Int>>()
         var current = mutableListOf<Int>()
 
@@ -77,47 +73,12 @@ class TripManagementViewModel @Inject constructor(
             groups.add(current.toList())
         }
         _pageGroup.value = groups
-        val end = currentPage.value * 10
-        val origin = end - 10
-        _trips.value = result.subList(origin, end)
-
-         */
-
 
     }
 
 
-    private val _trip = MutableStateFlow<Trip?>(Trip(
-        id = "trip_001",
-        bike = Bike(
-            id = "bike_003",
-            name = "E-Bike 3",
-            battery_status = null,
-            maximum_speed = 35,
-            maximum_functional_distance = 95
-        ),
-        hub = BikeHub(
-            id = "hub_4",
-            address = "16 street 7 Linh Chieu ward Thu Duc district Ho Chi Minh",
-            longitude = 106.612219,
-            latitude = 106.612219
-        ),
-        customer_id = "user_456",
-        trip_status = TripStatus.IN_PROGRESS,
-        reservation_date = System.currentTimeMillis(),
-        reservation_expiry = System.currentTimeMillis() + (15 * 60 * 1000), // +15 minutes
-        trip_start_date = System.currentTimeMillis(),
-        trip_end_date = null,
-        trip_end_long = null,
-        trip_end_lat = null,
-        trip_secret = List(32) {
-            "abcdefghijklmnopqrstuvwxyz0123456789".random()
-        }.joinToString(""),
-        price = null,
-        isPaid = null
-
-    ))
-    val trip: StateFlow<Trip?> = _trip
+    private val _trip = MutableStateFlow<Response_TripDTO?>(null)
+    val trip: StateFlow<Response_TripDTO?> = _trip
 
 
 

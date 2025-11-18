@@ -1,35 +1,18 @@
-
-import { ResultSetHeader } from "mysql2/promise";
-
-import crypto from "crypto";
-import { Trip } from "../../Models/Trip.js";
 import { pool } from "../../MySqlConfig.js";
-import { Response_MyTripsListingDTO, Response_TripDTO } from "@trungthao/mobile_app_dto";
-
-
-export async function getMyTrips(
-    customer_id: string,
-    page: number
-): Promise<Response_MyTripsListingDTO> {
+export async function getMyTrips(customer_id, page) {
     const LIMIT = 10;
     const offset = (page - 1) * LIMIT;
-
     // 1. Count total trips
-    const [countRows] = await pool.query(
-        `
+    const [countRows] = await pool.query(`
         SELECT COUNT(*) AS total
         FROM trips
         WHERE customer_id = ?
           AND deleted = 0
-        `,
-        [customer_id]
-    );
-    const total = (countRows as any)[0].total as number;
+        `, [customer_id]);
+    const total = countRows[0].total;
     const totalPages = Math.ceil(total / LIMIT);
-
     // 2. Fetch page data (same query as before)
-    const [rows] = await pool.query(
-        `
+    const [rows] = await pool.query(`
         SELECT
             t.id,
             t.bike_id,
@@ -65,11 +48,8 @@ export async function getMyTrips(
 
         ORDER BY t.reservation_date DESC
         LIMIT ? OFFSET ?
-        `,
-        [customer_id, LIMIT, offset]
-    );
-
-    const trips: Response_TripDTO[] = (rows as any[]).map(r => ({
+        `, [customer_id, LIMIT, offset]);
+    const trips = rows.map(r => ({
         trip: {
             id: r.id,
             bike_id: r.bike_id,
@@ -99,7 +79,6 @@ export async function getMyTrips(
             address: r.address
         },
     }));
-
     return {
         trips,
         total,
@@ -108,40 +87,29 @@ export async function getMyTrips(
         totalPages,
     };
 }
-
-export async function reserveBikeForCustomer(
-  customerId: string,
-  bikeId: string,
-  reservation_expiry: number,
-  trip_secret: string,
-  hubLong: number,
-  hubLat: number
-) {
-  const conn = await pool.getConnection();
-  try {
-    const [rows] = await conn.query(
-      "CALL CreateTripReservation(?, ?, ?, ?)",
-      [customerId, bikeId, hubLong, hubLat]
-    );
-    console.log("✅ Trip reservation successful:", rows);
-    return rows;
-  } catch (err: any) {
-    if (err.errno === 1644) {
-      // SQLSTATE '45000' from SIGNAL in the procedure
-      console.error("🚫 Customer already has a pending reservation");
-    } else {
-      console.error("❌ Error during trip reservation:", err);
+export async function reserveBikeForCustomer(customerId, bikeId, reservation_expiry, trip_secret, hubLong, hubLat) {
+    const conn = await pool.getConnection();
+    try {
+        const [rows] = await conn.query("CALL CreateTripReservation(?, ?, ?, ?)", [customerId, bikeId, hubLong, hubLat]);
+        console.log("✅ Trip reservation successful:", rows);
+        return rows;
     }
-    throw err;
-  } finally {
-    conn.release();
-  }
+    catch (err) {
+        if (err.errno === 1644) {
+            // SQLSTATE '45000' from SIGNAL in the procedure
+            console.error("🚫 Customer already has a pending reservation");
+        }
+        else {
+            console.error("❌ Error during trip reservation:", err);
+        }
+        throw err;
+    }
+    finally {
+        conn.release();
+    }
 }
-
-  
-export async function getTrips(customerId?: string): Promise<Trip[]> {
-  const [rows] = await pool.query<Trip[]>(
-    `
+export async function getTrips(customerId) {
+    const [rows] = await pool.query(`
     SELECT
       id,
       bike_id,
@@ -157,22 +125,17 @@ export async function getTrips(customerId?: string): Promise<Trip[]> {
     FROM trips
     WHERE (? IS NULL OR customer_id = ?)
     ORDER BY trip_start_date DESC
-    `,
-    [customerId ?? null, customerId ?? null]
-  );
-
-  return rows;
+    `, [customerId ?? null, customerId ?? null]);
+    return rows;
 }
-
 /**
  * Fetch the pending trip for a given customer (if any).
  *
  * @param customerId - The customer's UUID
  * @returns The Trip record or null if none pending
  */
-export async function getPendingTripByCustomerId(customerId: string): Promise<Trip | null> {
-  const [rows] = await pool.query<Trip[]>(
-    `
+export async function getPendingTripByCustomerId(customerId) {
+    const [rows] = await pool.query(`
     SELECT
       id,
       bike_id,
@@ -190,9 +153,6 @@ export async function getPendingTripByCustomerId(customerId: string): Promise<Tr
     WHERE customer_id = ?
       AND trip_status = 'pending'
     LIMIT 1
-    `,
-    [customerId]
-  );
-
-  return rows.length > 0 ? rows[0] : null;
+    `, [customerId]);
+    return rows.length > 0 ? rows[0] : null;
 }

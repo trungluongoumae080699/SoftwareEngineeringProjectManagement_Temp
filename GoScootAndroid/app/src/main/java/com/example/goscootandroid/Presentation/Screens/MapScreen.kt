@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.goscootandroid.EnvironmentObjects.LocalGlobalViewModelProvider
 import com.example.goscootandroid.Models.Domains.Destination
 import com.example.goscootandroid.Presentation.Components.Inputs.BrandButton
 import com.example.goscootandroid.Presentation.Components.Inputs.InputField
@@ -62,7 +63,7 @@ fun MapScreen(modifier: Modifier = Modifier, vm: MapScreenViewModel = hiltViewMo
     val currentSelectedCameraCenter by vm.currentSelectedCameraCenter.collectAsState()
     
     val hubIcon = BitmapFactory.decodeResource(context.resources, R.drawable.moto_hub)
-    //val globalVM = LocalGlobalViewModelProvider.current
+    val globalVM = LocalGlobalViewModelProvider.current
     val sheetState = remember {mutableStateOf(false)}
     val locationSearchSheetState = remember {mutableStateOf(false)}
     val snackbarHostState = remember { SnackbarHostState() }
@@ -121,11 +122,11 @@ fun MapScreen(modifier: Modifier = Modifier, vm: MapScreenViewModel = hiltViewMo
                 )
             IconButton(
                 modifier = Modifier.align(Alignment.TopStart).offset(x = 5.dp, y = 40.dp).clip(CircleShape).background(Color.White).size(45.dp),
-                onClick = { locationSearchSheetState.value = true}
+                onClick = {globalVM.goBack()}
             ) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,  // or any other icon
-                    contentDescription = "Search",
+                    contentDescription = "Go Back",
                     tint = Color.Black
                 )
             }

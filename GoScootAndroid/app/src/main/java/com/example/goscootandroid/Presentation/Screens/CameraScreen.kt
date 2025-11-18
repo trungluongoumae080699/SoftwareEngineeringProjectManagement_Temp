@@ -20,23 +20,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.goscootandroid.EnvironmentObjects.LocalGlobalViewModelProvider
 import com.example.goscootandroid.Presentation.Components.Modules.CameraPreview
 import com.example.goscootandroid.Presentation.Components.Modules.ScanBoxOverlay
 import com.example.goscootandroid.Presentation.Components.PermissionWrappers.CameraPermissionWrapper
+import com.example.goscootandroid.Presentation.ViewModel.GlobalViewModel
 
 @Composable
 fun CameraScreen() {
+     val globalVm: GlobalViewModel = LocalGlobalViewModelProvider.current
+
     CameraPermissionWrapper {
         Box(Modifier.fillMaxSize()) {
             CameraPreview()
             ScanBoxOverlay()
             IconButton(
                 modifier = Modifier.align(Alignment.TopStart).offset(x = 5.dp, y = 40.dp).clip(CircleShape).background(Color.White).size(45.dp),
-                onClick = { }
+                onClick = {globalVm.goBack()}
             ) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,  // or any other icon
-                    contentDescription = "Search",
+                    contentDescription = "Go Back",
                     tint = Color.Black
                 )
             }

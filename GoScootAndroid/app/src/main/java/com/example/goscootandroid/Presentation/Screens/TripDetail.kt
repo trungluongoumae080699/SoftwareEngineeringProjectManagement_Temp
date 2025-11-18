@@ -66,7 +66,7 @@ fun TripDetailScreen(
         while (validPeriod.value >= 0){
             trip?.let {
                 trip ->
-                validPeriod.value = trip.reservation_expiry - System.currentTimeMillis()
+                validPeriod.value = trip.trip.reservation_expiry - System.currentTimeMillis()
 
                 delay(1000)
             }
@@ -109,7 +109,7 @@ fun TripDetailScreen(
                     )
                 } else {
                     trip?.let { selectedTrip ->
-                        val statusColor = when (selectedTrip.trip_status) {
+                        val statusColor = when (selectedTrip.trip.trip_status) {
                             TripStatus.COMPLETE   -> Color.Green
                             TripStatus.CANCELLED  -> Color.Red
                             TripStatus.PENDING    -> Color.Yellow
@@ -124,7 +124,7 @@ fun TripDetailScreen(
                             )
                             Column {
                                 Row(verticalAlignment = Alignment.Bottom) {
-                                    val formattedDateTime = formatDateTime(selectedTrip.reservation_date,
+                                    val formattedDateTime = formatDateTime(selectedTrip.trip.reservation_date,
                                         TimePattern.HH_MM)
                                     val formattedDate = formattedDateTime.date
                                     val formattedTime = formattedDateTime.time
@@ -146,7 +146,7 @@ fun TripDetailScreen(
 
                                     ){
                                         Text(
-                                            selectedTrip.trip_status.value,
+                                            selectedTrip.trip.trip_status.value,
                                             style = MaterialTheme.typography.bodySmall.copy(
                                                 fontWeight = FontWeight.W600
                                             ),
@@ -173,7 +173,7 @@ fun TripDetailScreen(
                                         ))
                                         Spacer(modifier = Modifier.width(3.dp))
                                         var tripStartDateText = "___"
-                                        selectedTrip.trip_start_date?.let {
+                                        selectedTrip.trip.trip_start_date?.let {
                                                 tripStartDate ->
                                             val dateTime = formatDateTime(tripStartDate,
                                                 TimePattern.HH_MM)
@@ -190,7 +190,7 @@ fun TripDetailScreen(
                                         ))
                                         Spacer(modifier = Modifier.width(3.dp))
                                         var tripEndDateText = "___"
-                                        selectedTrip.trip_end_date?.let {
+                                        selectedTrip.trip.trip_end_date?.let {
                                                 tripEndDate ->
                                             val dateTime = formatDateTime(tripEndDate,  TimePattern.HH_MM)
                                             val date = dateTime.date
@@ -210,7 +210,7 @@ fun TripDetailScreen(
                                     ))
                                     Spacer(modifier = Modifier.width(3.dp))
                                     var priceText = "___"
-                                    selectedTrip.price?.let {
+                                    selectedTrip.trip.price?.let {
                                             price -> priceText = price.toString()
                                     }
                                     Text(priceText, style = MaterialTheme.typography.bodySmall)
@@ -222,7 +222,7 @@ fun TripDetailScreen(
                         Spacer(modifier = Modifier.height(10.dp))
                         BikeCard(selectedTrip.bike, onReserve = null)
                         Spacer(modifier = Modifier.height(10.dp))
-                        if (selectedTrip.trip_secret != null){
+                        if (selectedTrip.trip.trip_secret != null){
                             val encoder = BarcodeEncoder()
                             val payload = Json.encodeToString(selectedTrip)
                             val bitmap = encoder.encodeBitmap(

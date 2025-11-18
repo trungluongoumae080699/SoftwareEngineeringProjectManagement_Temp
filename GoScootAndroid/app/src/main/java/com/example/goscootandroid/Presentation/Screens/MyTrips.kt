@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.goscootandroid.EnvironmentObjects.LocalGlobalViewModelProvider
 import com.example.goscootandroid.Presentation.Components.Inputs.BrandButton
 import com.example.goscootandroid.Presentation.Components.Modules.Cards.TripCard
+import com.example.goscootandroid.Presentation.ViewModel.AppScreen
 import com.example.goscootandroid.Presentation.ViewModel.SnackbarType
 import com.example.goscootandroid.Presentation.ViewModel.TripManagementViewModel
 import com.example.goscootandroid.Repository.Retrofit.ApiError
@@ -120,7 +122,9 @@ fun MyTrips(
                         icon = Icons.Filled.QrCodeScanner,
                         contentPadding = PaddingValues(vertical = 5.dp),
                         iconModifier = Modifier.padding(horizontal = 5.dp),
-                        onClick = {}
+                        onClick = {
+                            globalVM.navigate(AppScreen.CAMERA, false)
+                        }
                     )
                 }
                 Spacer(modifier = Modifier.width(10.dp))
@@ -130,7 +134,9 @@ fun MyTrips(
                         icon = Icons.Filled.CalendarMonth,
                         contentPadding = PaddingValues(vertical = 5.dp),
                         iconModifier = Modifier.padding(horizontal = 5.dp),
-                        onClick = {}
+                        onClick = {
+                            globalVM.navigate(AppScreen.MAP, false)
+                        }
                     )
                 }
 
@@ -152,9 +158,12 @@ fun MyTrips(
                     .height(30.dp)
                     .fillMaxWidth()
             ) {
+                val isDisabled = pageGroupIndex == 0
+
                 IconButton(
                     onClick = { /* your logic */ },
-                    modifier = Modifier.size(30.dp).background(Color(0xFFDF6C20)).padding(0.dp)
+                    modifier = Modifier.size(30.dp).background(Color(0xFFDF6C20)).alpha(if (pageGroupIndex == 0) 0.5f else 1f).padding(0.dp),
+                    enabled = pageGroupIndex != 0
                 ) {
                     Icon(
                         imageVector = Icons.Filled.SkipPrevious,
@@ -165,13 +174,15 @@ fun MyTrips(
 
                 LazyRow {
                     items(pageGroup[pageGroupIndex], key = { it }) { page ->
+                        val isDisabled = currentPage == page
+
                         IconButton(
                             onClick = {
                                 vm.updateCurrentPage(page)
                                 vm.updateToFetchTrips(true)
                             },
-                            modifier = Modifier.size(30.dp).background(Color(0xFFDF6C20)).padding(0.dp),
-                            enabled = currentPage != page
+                            modifier = Modifier.size(30.dp).background(Color(0xFFDF6C20)).alpha(if (isDisabled) 0.5f else 1f).padding(0.dp),
+                            enabled = !isDisabled
                         ) {
                             Text(
                                 text = "$page",
@@ -188,11 +199,12 @@ fun MyTrips(
 
                 IconButton(
                     onClick = { /* your logic */ },
-                    modifier = Modifier.size(30.dp).background(Color(0xFFDF6C20)).padding(0.dp)
+                    modifier = Modifier.size(30.dp).background(Color(0xFFDF6C20)).alpha(if (pageGroupIndex == pageGroup.size - 1) 0.5f else 1f).padding(0.dp),
+                    enabled = pageGroupIndex != pageGroup.size - 1
                 ) {
                     Icon(
                         imageVector = Icons.Filled.SkipNext,
-                        contentDescription = "Prev"
+                        contentDescription = "Next"
                     )
                 }
 

@@ -1,0 +1,145 @@
+import { getCustomerById, getCustomerByPhoneNumber, insertCustomer } from "../Repositories/MySqlRepo/CustomerRepo.js";
+import crypto from "crypto";
+import bcrypt from "bcrypt";
+import { getSession, LogInType, saveSession } from "../Repositories/RedisRepo/SessionRepo.js";
+import { LogInRequestDTOSchema, RegistrationRequestDTOSchema } from "@trungthao/mobile_app_dto";
+import { getStaffByEmail } from "../Repositories/MySqlRepo/StaffRepo.js";
+import { AdminLogInRequestDTOSchema } from "@trungthao/admin_dashboard_dto";
+export const authenticateCustomer = async (request, response, next) => {
+    const parsed = LogInRequestDTOSchema.safeParse(request.body);
+    if (!parsed.success) {
+        return response.status(400).json({
+            message: "Dữ kiệu không chính xác, xin vui lòng thử lại"
+        });
+    }
+    const { phone_number, password } = parsed.data;
+    const user = await getCustomerByPhoneNumber(phone_number);
+    if (!user) {
+        return response.status(401).json({
+            message: "Số điện thoại hoặc mật khẩu không đúng. Xin vui lòng thử lại"
+        });
+    }
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+        return response.status(401).json({
+            message: "Số điện thoại hoặc mật khẩu không đúng. Xin vui lòng thử lại"
+        });
+    }
+    const sessionObject = {
+        _id: crypto.randomUUID(),
+        userId: user.id,
+        validPeriod: 3600000,
+        createdAt: new Date(),
+        logInType: LogInType.CUSTOMER
+    };
+    await saveSession(sessionObject);
+    const responseObject = {
+        user_profile: {
+            id: user.id,
+            full_name: user.full_name,
+            phone_number: user.password
+        },
+        session_id: sessionObject._id
+    };
+    response.status(200).json(responseObject);
+};
+export const formlessAuthenticateCustomer = async (request, response) => {
+    let session = null;
+    const sessionId = request.headers["authorization"];
+    if (sessionId) {
+        session = await getSession(sessionId);
+        if (session) {
+            const now = Date.now();
+            const createdAtMs = new Date(session.createdAt).getTime();
+            const expiryMs = createdAtMs + session.validPeriod;
+            if (now > expiryMs) {
+                response.status(401).json({ message: "Phiên đăng nhập đã hết hạn." });
+                return;
+            }
+            const user = await getCustomerById(session.userId);
+            if (user) {
+                const res = {
+                    user_profile: {
+                        id: user.id,
+                        full_name: user.full_name,
+                        phone_number: user.password
+                    },
+                    session_id: session._id
+                };
+                response.status(200).json(res);
+            }
+            else {
+                response.status(401).json({ message: "Không tìm thấy người dùng" });
+                return;
+            }
+        }
+    }
+    if (!sessionId || !session) {
+        response.status(401).json({ message: "Thiếu mã phiên đăng nhập." });
+        return;
+    }
+};
+export const registerCustomer = async (request, response, next) => {
+    console.log("Registering Customer");
+    const parsed = RegistrationRequestDTOSchema.safeParse(request.body);
+    if (!parsed.success) {
+        const firstError = parsed.error.issues[0].message; // show the first field’s message
+        return response.status(400).json({
+            message: firstError
+        });
+    }
+    const { full_name, phone_number, password } = parsed.data;
+    try {
+        // 2) Hash password
+        const hashed = await bcrypt.hash(password, 12);
+        // 3) Insert into DB
+        const id = crypto.randomUUID();
+        await insertCustomer(id, full_name, phone_number, hashed);
+        // 4) Created
+        return response.status(201).json({ id, full_name, phone_number });
+    }
+    catch (err) {
+        // MySQL duplicate key error -> 409 Conflict
+        if (err?.code === "ER_DUP_ENTRY") {
+            return response.status(400).json({ message: "Số điện thoại đã được đăng ký." });
+        }
+    }
+};
+export const authenticateAdmin = async (request, response, next) => {
+    const parsed = AdminLogInRequestDTOSchema.safeParse(request.body);
+    if (!parsed.success) {
+        return response.status(400).json({
+            message: "Dữ kiệu không chính xác, xin vui lòng thử lại"
+        });
+    }
+    const { email, password } = parsed.data;
+    const user = await getStaffByEmail(email);
+    if (!user) {
+        return response.status(401).json({
+            message: "Email hoặc mật khẩu không đúng. Xin vui lòng thử lại"
+        });
+    }
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+        return response.status(401).json({
+            message: "Email hoặc mật khẩu không đúng. Xin vui lòng thử lại..."
+        });
+    }
+    const sessionObject = {
+        _id: crypto.randomUUID(),
+        userId: user.id,
+        validPeriod: 3600000,
+        createdAt: new Date(),
+        logInType: LogInType.ADMIN
+    };
+    await saveSession(sessionObject);
+    const responseObject = {
+        staffProfile: {
+            id: user.id,
+            full_name: user.full_name,
+            email: user.password
+        },
+        sessionId: sessionObject._id
+    };
+    response.status(200).json(responseObject);
+};

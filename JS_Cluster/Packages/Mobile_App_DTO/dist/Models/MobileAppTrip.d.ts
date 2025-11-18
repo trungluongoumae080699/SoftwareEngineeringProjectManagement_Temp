@@ -7,6 +7,7 @@ export declare enum MobileAppTripStateEnum {
 export type MobileAppTrip = {
     id: string;
     bike_id: string;
+    hub_id: string;
     customer_id: string;
     trip_status: MobileAppTripStateEnum;
     reservation_date: number;

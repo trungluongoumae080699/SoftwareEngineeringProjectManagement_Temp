@@ -112,7 +112,7 @@ fun BikeCard(
                             Row(modifier = Modifier.width(18.dp).height(9.dp)){
                                 BatteryGauge(status)
                             }
-                            Text(text = "${batteryStatus}%", fontFamily = RobotoMono, fontWeight = FontWeight.W600, fontSize = 10.sp, color = Color.White)
+                            Text(text = "${batteryStatus}%", fontFamily = RobotoMono, fontWeight = FontWeight.W600, fontSize = 10.sp, color = Color.White, lineHeight = 1.sp)
                         }
                     }
 
@@ -125,7 +125,7 @@ fun BikeCard(
                         tint = Color(0xFF757575),
                         modifier = Modifier.width(15.dp).height(15.dp)
                     )
-                    Text(text = "${maxDistance} km", fontFamily = RobotoMono, fontWeight = FontWeight.W600, fontSize = 10.sp)
+                    Text(text = "${maxDistance} km", fontFamily = RobotoMono, fontWeight = FontWeight.W600, fontSize = 10.sp, lineHeight = 1.sp)
                 }
             }
         }

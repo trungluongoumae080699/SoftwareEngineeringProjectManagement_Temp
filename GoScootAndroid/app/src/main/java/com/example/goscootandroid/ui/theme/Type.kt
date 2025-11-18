@@ -34,7 +34,7 @@ val Typography = Typography(
         fontFamily = BeVietnamPro,
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
-        lineHeight = 22.sp,   // ~1.46× font size → comfortable for paragraphs
+        lineHeight = 1.sp,   // ~1.46× font size → comfortable for paragraphs
         letterSpacing = 0.3.sp
     ),
 
@@ -42,7 +42,7 @@ val Typography = Typography(
         fontFamily = BeVietnamPro,
         fontWeight = FontWeight.Medium,
         fontSize = 15.sp,
-        lineHeight = 20.sp,   // ~1.43× font size → balanced for forms/text
+        lineHeight = 1.sp,   // ~1.43× font size → balanced for forms/text
         letterSpacing = 0.25.sp
     ),
 
@@ -50,7 +50,7 @@ val Typography = Typography(
         fontFamily = BeVietnamPro,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
-        lineHeight = 18.sp,   // ~1.38× font size → subtle supporting text
+        lineHeight = 1.sp,   // ~1.38× font size → subtle supporting text
         letterSpacing = 0.2.sp
     ),
 
@@ -58,7 +58,7 @@ val Typography = Typography(
         fontFamily = BeVietnamPro,
         fontWeight = FontWeight.ExtraBold,
         fontSize = 24.sp,
-        lineHeight = 32.sp,   // ~1.33× → crisp headline
+        lineHeight = 1.sp,   // ~1.33× → crisp headline
         letterSpacing = 0.sp
     ),
 
@@ -66,7 +66,7 @@ val Typography = Typography(
         fontFamily = BeVietnamPro,
         fontWeight = FontWeight.SemiBold,
         fontSize = 18.sp,
-        lineHeight = 25.sp,   // ~1.38× font size → well-balanced for buttons/headings
+        lineHeight = 1.sp,   // ~1.38× font size → well-balanced for buttons/headings
         letterSpacing = 0.15.sp
     ),
 
@@ -74,7 +74,7 @@ val Typography = Typography(
         fontFamily = BeVietnamPro,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
-        lineHeight = 16.sp,   // ~1.33× → perfect for captions/links
+        lineHeight = 1.sp,   // ~1.33× → perfect for captions/links
         letterSpacing = 0.4.sp
     )
 )

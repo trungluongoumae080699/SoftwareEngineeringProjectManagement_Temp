@@ -19,6 +19,7 @@
     "db:insert_staff": "ts-node --esm src/scripts/sql_migration/insert_staff.ts",
     "db:insert_customers": "ts-node --esm src/scripts/sql_migration/insert_customers.ts",
     "db:insert_trips": "ts-node --esm src/scripts/sql_migration/insert_trips.ts",
+    "db:update_bikes_names": "ts-node --esm src/scripts/sql_migration/update_bike_names.ts",
     "hub:gen": "ts-node --esm src/scripts/json_sample_data_gen/create_hubs_json.ts",
     "bike:gen": "ts-node --esm src/scripts/json_sample_data_gen/create_bikes_json.ts",
     "staff:gen": "ts-node --esm src/scripts/json_sample_data_gen/create_staff_json.ts",
