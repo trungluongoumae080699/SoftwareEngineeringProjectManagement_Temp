@@ -102,23 +102,6 @@ const COLLISION_DISTANCE = 0.002;  // Minimum distance between scooters
 - **Medium (30-50)**: Balanced performance and realism ✅ Recommended
 - **High (60-100)**: More realistic but may impact performance
 
-## 🎮 Usage
-
-Once the application is running:
-
-1. **Navigate the Map**: 
-   - Drag to pan
-   - Scroll to zoom
-   - Use navigation controls in the top-right
-
-2. **Watch Scooters**: 
-   - Scooters automatically move along routes
-   - They avoid colliding with each other
-   - Routes update every 30 seconds
-
-3. **Locate Yourself**:
-   - Click the location button to center on your position
-
 ## 🐛 Troubleshooting
 
 ### Map Not Loading
@@ -185,3 +168,4 @@ npm run dev -- --port 3000
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `VITE_MAPBOX_TOKEN` | Your Mapbox access token | Yes |
+
