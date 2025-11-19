@@ -91,7 +91,7 @@ You can customize the scooter animation by editing `src/scooterAnimation.ts`:
 ```typescript
 // Configuration
 const NUM_SCOOTERS = 50;           // Number of scooters (1-100)
-const SCOOTER_SPEED = 0.00001;     // Movement speed
+const SCOOTER_SPEED = 0.000002;     // Movement speed
 ```
 
 ### Adjusting Scooter Count:
@@ -173,6 +173,7 @@ goscoot-map/
 
 3. **Locate Yourself**:
    - Click the location button to center on your position
+
 
 
 
