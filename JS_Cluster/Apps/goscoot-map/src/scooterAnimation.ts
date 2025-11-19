@@ -1,8 +1,8 @@
 import mapboxgl from 'mapbox-gl';
 
 // Configuration
-const NUM_SCOOTERS = 50; // Optimized number for performance and visual density
-const SCOOTER_SPEED = 0.00001; // Much slower, more realistic
+const NUM_SCOOTERS = 50; //Number of scooter 
+const SCOOTER_SPEED = 0.00001; 
 const COLLISION_DISTANCE = 0.002; // Minimum distance between scooters
 
 // HCM City bounds
@@ -165,3 +165,4 @@ export const animateScooters = (
 export const cleanupScooters = (scooters: Scooter[]) => {
   scooters.forEach((scooter) => scooter.marker?.remove());
 };
+
