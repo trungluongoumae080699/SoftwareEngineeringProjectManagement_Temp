@@ -41,7 +41,7 @@ function BikeDetails({ onNavigate }: BikeDetailsProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   
   // Initialize map with bike animation (only bike, no scooters)
-  const vehiclesRef = useMapAnimation(mapContainerRef, BIKE_LOCATION, 14, BIKE_LOCATION, true);
+  const vehiclesRef = useMapAnimation(mapContainerRef, BIKE_LOCATION, 14, BIKE_LOCATION, false);
 
   return (
     <div className="bike-details-container">
@@ -111,3 +111,4 @@ function BikeDetails({ onNavigate }: BikeDetailsProps) {
 }
 
 export default BikeDetails;
+
