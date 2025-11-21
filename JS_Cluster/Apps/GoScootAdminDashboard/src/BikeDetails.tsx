@@ -1,8 +1,3 @@
-/**
- * Bike Details Page
- * Displays detailed information about a specific bike (VIN-123456)
- * Shows bike info, battery status, trip history, and live location on map
- */
 
 import { useState, useRef } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -29,6 +24,14 @@ const trips = Array(6).fill(null).map((_, i) => ({
   dateRange: '1/11/2025 - 2/11/2025',
 }));
 
+/** Mock movement history data - will be replaced with API data in production */
+const movementHistory = Array(8).fill(null).map((_, i) => ({
+  id: i + 1,
+  batteryStatus: `${100 - i * 5}%`,
+  location: `106.${6297 + i * 10}, 10.${8231 + i * 5}`,
+  timestamp: `2025-01-${21 + i} ${10 + i}:${30 + i * 5}:00`,
+}));
+
 /**
  * BikeDetails component
  * Main page showing comprehensive bike information and live tracking
@@ -40,7 +43,7 @@ function BikeDetails({ onNavigate }: BikeDetailsProps) {
   // Reference to map container DOM element
   const mapContainerRef = useRef<HTMLDivElement>(null);
   
-  // Initialize map with bike animation (only bike, no scooters)
+  // Initialize map with all vehicles (bike + scooters)
   const vehiclesRef = useMapAnimation(mapContainerRef, BIKE_LOCATION, 14, BIKE_LOCATION, false);
 
   return (
@@ -104,6 +107,29 @@ function BikeDetails({ onNavigate }: BikeDetailsProps) {
               <div ref={mapContainerRef} className="trip-map" />
             </div>
           </div>
+
+          {/* Movement History Section */}
+          <div className="movement-history-section">
+            <h3>Movement History</h3>
+            <table className="trips-table">
+              <thead>
+                <tr>
+                  <th>Battery Status</th>
+                  <th>Long - Lat</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                {movementHistory.map((movement) => (
+                  <tr key={movement.id}>
+                    <td>{movement.batteryStatus}</td>
+                    <td>{movement.location}</td>
+                    <td>{movement.timestamp}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -111,4 +137,3 @@ function BikeDetails({ onNavigate }: BikeDetailsProps) {
 }
 
 export default BikeDetails;
-
