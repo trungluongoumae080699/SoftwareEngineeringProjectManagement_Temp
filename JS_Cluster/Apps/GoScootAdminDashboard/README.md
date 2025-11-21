@@ -1,181 +1,72 @@
-# GoScoot Map - Animated Scooter Visualization
+# GoScoot Admin Dashboard
 
-An interactive map application built with React, TypeScript, and Mapbox GL JS that displays animated scooters moving around Ho Chi Minh City with realistic routing and collision avoidance.
+Admin dashboard for GoScoot bike/scooter rental service with real-time vehicle tracking.
 
-## 🚀 Features
+## 🚀 Getting Started
 
-- **Interactive Mapbox Map**: Full-featured map with zoom, pan, and navigation controls
-- **50 Animated Scooters**: Realistic scooter traffic simulation across HCM City
-- **Smart Routing**: Scooters follow actual roads using Mapbox Directions API
-- **Smooth Animation**: 60 FPS animation using requestAnimationFrame
-- **Responsive Design**: Works on desktop and tablet devices
+### Prerequisites
 
-## 📋 Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- Mapbox Access Token ([Get free token](https://account.mapbox.com/))
 
-Before you begin, ensure you have the following installed:
+### Installation
 
-- **Node.js** (v18 or higher) - [Download here](https://nodejs.org/)
-- **npm** (comes with Node.js) or **yarn**
-- **Mapbox Access Token** - [Get one free here](https://account.mapbox.com/access-tokens/)
-
-## 🛠️ Installation
-
-### 1. Clone the Repository
+1. **Clone the repository**
 
 ```bash
-git clone <your-repository-url>
-cd GoScootJSCluster/JS_Cluster/Apps/GoScootAdminDashboard
+git clone <repository-url>
+cd <repository-name>
 ```
 
-### 2. Install Dependencies
+2. **Install dependencies**
 
 ```bash
 npm install
 ```
 
-Or if you prefer yarn:
+3. **Configure environment variables**
 
-```bash
-yarn install
-```
-
-### 3. Configure Mapbox Token
-
-Create a `.env` file in the project root:
-
-```bash
-# Create .env file
-touch .env
-```
-
-Add your Mapbox access token to the `.env` file:
+Create a `.env` file in the root directory:
 
 ```env
 VITE_MAPBOX_TOKEN=your_mapbox_token_here
 ```
 
-**Important**: Replace `your_mapbox_token_here` with your actual Mapbox access token.
-
-#### How to Get a Mapbox Token:
-
-1. Go to [Mapbox Account](https://account.mapbox.com/)
-2. Sign up or log in
-3. Navigate to "Access Tokens"
-4. Create a new token or copy your default public token
-5. Paste it in your `.env` file
-
-## 🚀 Running the Application
-
-### Development Mode
-
-Start the development server with hot reload:
+4. **Run the development server**
 
 ```bash
 npm run dev
 ```
 
-The application will open at `http://localhost:5173` (or another port if 5173 is busy).
+The app will open at `http://localhost:5173`
 
-### Production Build
-
-Build the application for production:
+### Build for Production
 
 ```bash
 npm run build
 ```
 
-## ⚙️ Configuration
-
-You can customize the scooter animation by editing `src/scooterAnimation.ts`:
-
-```typescript
-// Configuration
-const NUM_SCOOTERS = 50;           // Number of scooters (1-100)
-const SCOOTER_SPEED = 0.000002;     // Movement speed
-```
-
-### Adjusting Scooter Count:
-
-- **Low (10-20)**: Better performance, less traffic
-- **Medium (30-50)**: Balanced performance and realism ✅ Recommended
-- **High (60-100)**: More realistic but may impact performance
-
-## 🐛 Troubleshooting
-
-### Map Not Loading
-
-**Problem**: Blank screen or error message
-
-**Solutions**:
-- Check that your `.env` file exists and contains a valid Mapbox token
-- Verify the token format: `VITE_MAPBOX_TOKEN=pk.xxxxx`
-- Restart the development server after adding the token
-
-### Scooters Not Appearing
-
-**Problem**: Map loads but no scooters visible
-
-**Solutions**:
-- Check browser console for errors
-- Ensure `scooter_type.png` exists in the `public` folder
-- Verify your internet connection (needed for Mapbox Directions API)
-
-### Performance Issues
-
-**Problem**: Laggy animation or slow map
-
-**Solutions**:
-- Reduce `NUM_SCOOTERS` in `scooterAnimation.ts`
-- Close other browser tabs
-- Try a different browser (Chrome recommended)
-- Check your internet speed
-
-## 🔧 Development
-
-### Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-
-### Tech Stack
-
-- **React 19** - UI framework
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **Mapbox GL JS** - Interactive maps
-- **Mapbox Directions API** - Route generation
-
-## 📝 Environment Variables
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `VITE_MAPBOX_TOKEN` | Your Mapbox access token | Yes |
-
 ## 📁 Project Structure
 
 ```
-goscoot-map/
-├── public/
-│   └── scooter_type.png          # Scooter marker icon
-├── src/
-│   ├── Map.tsx                    # Main map component (UI & map setup)
-│   ├── scooterAnimation.ts        # Scooter animation logic (50 scooters)
-│   ├── main.tsx                   # React entry point
-│   └── index.css                  # All application styles
-├── .env                           # Environment variables (create this)
-├── package.json                   # Project dependencies
-├── tsconfig.json                  # TypeScript configuration
-├── vite.config.ts                 # Vite build configuration
-└── README.md                      # This file
+src/
+├── components/
+│   ├── Header.tsx              # Reusable header component
+│   └── Sidebar.tsx             # Navigation sidebar
+├── hooks/
+│   └── useMapAnimation.ts      # Map animation hook
+├── App.tsx                     # Root component with routing
+├── Map.tsx                     # Main map page (50 scooters + 1 bike)
+├── BikeDetails.tsx             # Bike detail page
+├── vehicleAnimation.ts         # Vehicle animation engine
+├── BikeDetails.css             # Styles
+└── main.tsx                    # Entry point
+```
 
+## 🛠️ Tech Stack
 
-3. **Locate Yourself**:
-   - Click the location button to center on your position
-
-
-
-
-
-
+- React 19 + TypeScript
+- Vite
+- Mapbox GL JS
+- React Icons
