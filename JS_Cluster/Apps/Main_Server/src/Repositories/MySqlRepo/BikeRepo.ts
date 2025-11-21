@@ -1,5 +1,8 @@
 import { BikeStatus, Bike } from "../../Models/Bike.js";
 import { pool } from "../../MySqlConfig.js";
+import { MobileAppBikeDTO} from "../../DTOs/MobileApp/Response_MobileAppBikeDTO.js"
+import { MobileAppBike } from "@trungthao/mobile_app_dto";
+import { RowDataPacket } from "mysql2";
 
 
 
@@ -40,5 +43,22 @@ export async function getBikes(hubId?: string, status?: BikeStatus): Promise<Bik
   }
 
   const [rows] = await pool.query<Bike[]>(sql, params);
+  return rows;
+}
+
+export async function getMobileAppBikesByHub(
+  hubId: string
+): Promise<MobileAppBike[]> {
+  const sql = `
+    SELECT
+      id,
+      name,
+      maximum_speed,
+      maximum_functional_distance
+    FROM bikes
+    WHERE current_hub = ?
+  `;
+
+  const [rows] = await pool.query<(RowDataPacket & MobileAppBike)[]>(sql, [hubId]);
   return rows;
 }

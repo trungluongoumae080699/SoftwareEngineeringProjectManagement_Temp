@@ -2,10 +2,10 @@ export declare enum MobileAppBikeType {
     SCOOTER = "scooter",
     BIKE = "bike"
 }
-export type MobileAppBike = {
+export interface MobileAppBike {
     id: string;
     name: string;
     battery_status?: number | null;
     maximum_speed: number;
     maximum_functional_distance: number;
-};
+}
