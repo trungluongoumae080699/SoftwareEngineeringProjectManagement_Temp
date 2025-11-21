@@ -1,8 +1,4 @@
-/**
- * Bike Details Page
- * Displays detailed information about a specific bike (VIN-123456)
- * Shows bike info, battery status, trip history, and live location on map
- */
+
 
 import { useState, useRef } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -29,6 +25,17 @@ const trips = Array(6).fill(null).map((_, i) => ({
   dateRange: '1/11/2025 - 2/11/2025',
 }));
 
+/** Mock movement history data - will be replaced with API data in production */
+const movementHistory = Array(8).fill(null).map((_, i) => {
+  const date = new Date(2025, 0, 21 + i, 10 + i, 30 + i * 5);
+  return {
+    id: i + 1,
+    batteryStatus: `${100 - i * 5}%`,
+    location: `106.${6297 + i * 10}, 10.${8231 + i * 5}`,
+    timestamp: date.toISOString().replace('T', ' ').substring(0, 19),
+  };
+});
+
 /**
  * BikeDetails component
  * Main page showing comprehensive bike information and live tracking
@@ -37,11 +44,55 @@ function BikeDetails({ onNavigate }: BikeDetailsProps) {
   // Track which trip is selected in the table
   const [selectedTrip, setSelectedTrip] = useState<number | null>(null);
   
+  // Date filter state for movement history
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+  
   // Reference to map container DOM element
   const mapContainerRef = useRef<HTMLDivElement>(null);
   
-  // Initialize map with bike animation (only bike, no scooters)
-  const vehiclesRef = useMapAnimation(mapContainerRef, BIKE_LOCATION, 14, BIKE_LOCATION, true);
+  // Initialize map with all vehicles (bike + scooters)
+  const vehiclesRef = useMapAnimation(mapContainerRef, BIKE_LOCATION, 14, BIKE_LOCATION, false);
+
+  // Filter movement history by date range
+  const filteredMovementHistory = movementHistory.filter((movement) => {
+    if (!startDate && !endDate) return true;
+    
+    const movementDate = new Date(movement.timestamp);
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate) : null;
+    
+    if (start && end) {
+      return movementDate >= start && movementDate <= end;
+    } else if (start) {
+      return movementDate >= start;
+    } else if (end) {
+      return movementDate <= end;
+    }
+    return true;
+  });
+
+  // Export movement history to CSV
+  const exportToCSV = () => {
+    const headers = ['Battery Status', 'Long - Lat', 'Timestamp'];
+    const csvContent = [
+      headers.join(','),
+      ...filteredMovementHistory.map(m => 
+        `${m.batteryStatus},"${m.location}",${m.timestamp}`
+      )
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `movement-history-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="bike-details-container">
@@ -103,6 +154,61 @@ function BikeDetails({ onNavigate }: BikeDetailsProps) {
             >
               <div ref={mapContainerRef} className="trip-map" />
             </div>
+          </div>
+
+          {/* Movement History Section */}
+          <div className="movement-history-section">
+            <div className="movement-history-header">
+              <h3>Movement History</h3>
+              <div className="movement-history-controls">
+                <div className="date-filters">
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    placeholder="Start Date"
+                    className="date-input"
+                  />
+                  <span>to</span>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    placeholder="End Date"
+                    className="date-input"
+                  />
+                </div>
+                <button onClick={exportToCSV} className="export-btn">
+                  Export CSV
+                </button>
+              </div>
+            </div>
+            <table className="trips-table">
+              <thead>
+                <tr>
+                  <th>Battery Status</th>
+                  <th>Long - Lat</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredMovementHistory.length > 0 ? (
+                  filteredMovementHistory.map((movement) => (
+                    <tr key={movement.id}>
+                      <td>{movement.batteryStatus}</td>
+                      <td>{movement.location}</td>
+                      <td>{movement.timestamp}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={3} style={{ textAlign: 'center', padding: '2rem' }}>
+                      No movement history found for the selected date range
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

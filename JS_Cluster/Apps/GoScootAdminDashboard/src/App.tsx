@@ -1,8 +1,4 @@
-/**
- * App Component
- * Root component managing page navigation and state
- * Handles routing between Map and BikeDetails pages
- */
+
 
 import { useState } from 'react';
 import Map from './Map';
@@ -45,3 +41,4 @@ function App() {
 }
 
 export default App;
+
