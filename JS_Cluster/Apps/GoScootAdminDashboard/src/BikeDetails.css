@@ -264,12 +264,66 @@
   overflow: hidden;
 }
 
-.movement-history-section h3 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin: 0 0 1rem 0;
+.movement-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 1rem;
   background: #f5f5f5;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.movement-history-header h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.movement-history-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.date-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.date-input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #C85A28;
+}
+
+.export-btn {
+  padding: 0.5rem 1.5rem;
+  background: #C85A28;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
+}
+
+.export-btn:hover {
+  background: #a64820;
+}
+
+.export-btn:active {
+  transform: scale(0.98);
 }
 
 /* Responsive */
