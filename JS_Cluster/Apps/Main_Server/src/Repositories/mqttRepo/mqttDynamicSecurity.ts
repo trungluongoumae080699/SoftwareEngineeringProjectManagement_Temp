@@ -29,6 +29,7 @@ function sendDynSecCommand(payload: DynSecPayload): Promise<void> {
     });
 }
 
+
 /**
  * Create a temporary MQTT user for a dashboard session
  */
