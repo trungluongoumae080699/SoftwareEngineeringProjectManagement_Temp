@@ -40,9 +40,9 @@ async function startServer() {
     app.use(express.json());
     app.use(express.static("Asset"));
 
-    app.use("/GoScoot/Server/app/auth", mobileAppAuthenticationRouter);
-    app.use("/GoScoot/Server/dashboard/auth", dashboardAuthenticationRouter)
-    app.use("/GoScoot/Server/app", authorize([LogInType.CUSTOMER]), mobileAppNonAuthRouter);
+    app.use("/app/auth", mobileAppAuthenticationRouter);
+    app.use("/dashboard/auth", dashboardAuthenticationRouter)
+    app.use("/app", authorize([LogInType.CUSTOMER]), mobileAppNonAuthRouter);
 
     /** 404 handler (no route matched) */
     app.use((req: Request, res: Response) => {
