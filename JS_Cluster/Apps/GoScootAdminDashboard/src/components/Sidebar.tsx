@@ -15,10 +15,6 @@ import "./Sidebar.css";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-/** Props for the Sidebar component */
-interface SidebarProps {
-  onNavigate: (page: string) => void;
-}
 
 /** Configuration for navigation menu items */
 const menuItems = [
@@ -58,35 +54,9 @@ const menuItems = [
  * Sidebar navigation component
  * Renders a vertical navigation menu with icons and labels
  */
-export default function Sidebar({ onNavigate }: SidebarProps) {
+export default function Sidebar() {
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState<string | null>(null); // tracks which parent is open
-
-  const toggleMenu = (id: string) => {
-    setOpenMenu(openMenu === id ? null : id);
-  };
-
-  useEffect(() => {
-    let currentLabel = null;
-
-    const parentItem = menuItems.find(
-      (item) => item.route === location.pathname
-    );
-
-    if (parentItem) {
-      currentLabel = parentItem.label;
-    } else {
-      menuItems.forEach((item) => {
-        item.subItems?.forEach((sub) => {
-          if (sub.route === location.pathname) {
-            currentLabel = sub.label;
-          }
-        });
-      });
-    }
-
-    if (currentLabel) onNavigate(currentLabel);
-  }, [location.pathname, onNavigate]);
 
   return (
     <aside className="sidebar">
@@ -100,8 +70,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
                 location.pathname === route ? "active" : ""
               }`}
               onClick={() => {
-                onNavigate(label);
-                subItems ? toggleMenu(id) : setOpenMenu(null);
+                subItems ? setOpenMenu(id) : setOpenMenu(null);
               }}
             >
               <Icon className="nav-icon" size={24} />
@@ -122,9 +91,6 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
                         className={`nav-item sub-item ${
                           location.pathname === subRoute ? "active" : ""
                         }`}
-                        onClick={() => {
-                          onNavigate(subLabel);
-                        }}
                       >
                         <Icon className="nav-icon" size={24} />
                         <span>{subLabel}</span>
@@ -137,10 +103,10 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
           </div>
         ))}
       </nav>
-      <button className="nav-item logout">
+      <Link to='/login' className="nav-item logout">
         <MdLogout className="nav-icon" size={24} />
         <span>Logout</span>
-      </button>
+      </Link>
     </aside>
   );
 }
