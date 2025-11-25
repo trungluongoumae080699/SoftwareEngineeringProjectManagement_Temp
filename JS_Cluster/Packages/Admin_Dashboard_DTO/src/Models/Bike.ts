@@ -15,4 +15,5 @@ export interface Bike  {
     current_hub?: string | null,
     deleted: boolean,
     created_at: Date
+    battery_status?: number | null
 }

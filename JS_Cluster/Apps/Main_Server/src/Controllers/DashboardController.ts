@@ -3,19 +3,95 @@ import { Response } from "express";
 import { redisClient } from "../RedisConfig.js";
 import { fetchBikeIdsAndBatteries } from "../Repositories/RedisRepo/BikeRepo.js";
 import { getBikesByFilter } from "../Repositories/MySqlRepo/BikeRepo.js";
+import { TripStatus } from "@trungthao/admin_dashboard_dto";
+import { getTrips } from "../Repositories/MySqlRepo/TripRepo.js";
+
+
+export type TripSortField = "reservation_date" | "price";
+export type SortDirection = "asc" | "desc";
+
+export interface GetTripsOptions {
+  bikeId?: string;
+  status?: TripStatus;
+  reservationFrom?: number; 
+  reservationTo?: number;
+  sortBy?: TripSortField;   
+  sortDirection?: SortDirection; // default: "desc"
+  page?: number;            // default: 1
+  pageSize?: number;        // default: 20
+}
 
 export const fetchTripsByBike = async (
-    request: CustomRequest<{ bikeId: string }, {}, {}, {
-        from?: string,
-        to?: string
-    }>,
-    response: Response
+  request: CustomRequest<
+    { bikeId: string }, // params
+    {},                 // body
+    {},                 // headers
+    {
+      from?: string;
+      to?: string;
+      status?: TripStatus;
+      sortBy?: TripSortField;
+      sortDirection?: SortDirection;
+      page?: string;
+      pageSize?: string;
+    }
+  >,
+  response: Response
 ) => {
-    const bikeId = request.params
-    const { from, to } = request.query;
+  try {
+    const { bikeId } = request.params;
+    if (!bikeId) {
+      return response.status(400).json({ error: "bikeId path parameter is required" });
+    }
 
+    const {
+      from,
+      to,
+      status,
+      sortBy,
+      sortDirection,
+      page,
+      pageSize,
+    } = request.query;
 
+    // Parse from/to -> numbers (BIGINT)
+    let reservationFrom: number | undefined;
+    let reservationTo: number | undefined;
 
+    if (from !== undefined) {
+      const n = Number(from);
+      if (Number.isNaN(n)) {
+        return response.status(400).json({ error: "`from` must be a number" });
+      }
+      reservationFrom = n;
+    }
+
+    if (to !== undefined) {
+      const n = Number(to);
+      if (Number.isNaN(n)) {
+        return response.status(400).json({ error: "`to` must be a number" });
+      }
+      reservationTo = n;
+    }
+
+    const options: GetTripsOptions = {
+      bikeId,
+      status,
+      reservationFrom,
+      reservationTo,
+      sortBy,
+      sortDirection,
+      page: page ? Number(page) : undefined,
+      pageSize: pageSize ? Number(pageSize) : undefined,
+    };
+
+    const result = await getTrips(options);
+
+    return response.json(result);
+  } catch (err) {
+    console.error("fetchTripsByBike error:", err);
+    return response.status(500).json({ error: "Internal server error" });
+  }
 };
 
 export const fetchTelegramByBike = async (
