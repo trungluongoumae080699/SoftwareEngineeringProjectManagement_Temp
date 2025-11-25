@@ -3,7 +3,7 @@ import { Response } from "express";
 import { redisClient } from "../RedisConfig.js";
 import { fetchBikeIdsAndBatteries } from "../Repositories/RedisRepo/BikeRepo.js";
 import { getBikesByFilter } from "../Repositories/MySqlRepo/BikeRepo.js";
-import { TripStatus } from "@trungthao/admin_dashboard_dto";
+import { BikeTelemetry, TripStatus } from "@trungthao/admin_dashboard_dto";
 import { getTrips } from "../Repositories/MySqlRepo/TripRepo.js";
 
 
@@ -93,6 +93,26 @@ export const fetchTripsByBike = async (
     return response.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+export type BikeTelemetrySortField = "time";
+
+export interface GetBikeTelemetryOptions {
+  bikeId: string;           // mandatory
+  from?: number;            // optional time filter (>=)
+  to?: number;              // optional time filter (<=)
+  page?: number;            // default 1
+  pageSize?: number;        // default 50
+  sortDirection?: SortDirection; // default "desc" (latest first)
+}
+
+export interface GetBikeTelemetryResult {
+  data: BikeTelemetry[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
 
 export const fetchTelegramByBike = async (
     request: CustomRequest<{ bikeId: string }, {}, {}, {
