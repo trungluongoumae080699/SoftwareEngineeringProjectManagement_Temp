@@ -53,6 +53,18 @@ export const fetchBikes = async (
             offset,
         });
 
+        for (const b of sqlResult.bikes) {
+            const redisKey = `bike:${b.id}:telemetry`;
+
+            // HGETALL returns Record<string, string>
+            const tele = await redisClient.hGetAll(redisKey);
+
+            const batteryStatus = tele.battery_status
+                ? Number(tele.battery_status)
+                : null;
+            b.battery_status = batteryStatus
+        }
+
         return response.json(sqlResult);
     }
 

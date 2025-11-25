@@ -7,6 +7,7 @@ export interface Bike {
     id: string;
     name: string;
     status: BikeStatus;
+    battery_status?: number | null
     maximum_speed: number;
     maximum_functional_distance: number;
     purchase_date: number;
