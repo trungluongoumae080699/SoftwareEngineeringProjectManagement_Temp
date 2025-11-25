@@ -3,3 +3,4 @@ export * from './Models/BikeTelemetry.js';
 export * from './Requests/Request_DashboardLogInDTO.js';
 export * from './Responses/Response_DashboardLogInDTO.js';
 export * from './Models/BikeUpdates.js';
+export * from './Models/Bike.js';
