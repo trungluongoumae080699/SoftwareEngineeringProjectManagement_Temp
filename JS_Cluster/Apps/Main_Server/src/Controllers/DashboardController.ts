@@ -100,5 +100,14 @@ export const fetchBikes = async (
         offset,
     });
 
+      for (const b of sqlResult.bikes) {
+            for (const ba_id of redisBikes){
+                if (ba_id.id === b.id){
+                    b.battery_status = ba_id.battery
+                    break
+                }
+            }
+        }
+
     return response.json(sqlResult);
 };
