@@ -45,7 +45,7 @@ export async function getBikeTelemetry(
   // ---------- 1) COUNT query ----------
   const countQuery = `
     SELECT count() AS total
-    FROM bike_telemetry
+    FROM telemetry
     ${whereSql}
   `;
 
@@ -74,11 +74,11 @@ export async function getBikeTelemetry(
     SELECT
       id,
       bike_id,
-      battery,
+      battery_status,
       longitude,
       latitude,
       time
-    FROM bike_telemetry
+    FROM telemetry
     ${whereSql}
     ORDER BY time ${orderDir}
     LIMIT {limit:UInt32} OFFSET {offset:UInt64}

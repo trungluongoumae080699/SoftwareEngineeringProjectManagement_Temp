@@ -4,7 +4,7 @@ import { authenticateAdmin, authenticateCustomer, formlessAuthenticateDashboard,
 import { NextFunction } from "express-serve-static-core";
 import { CustomRequest } from "../../Middlewares/Authorization.js";
 import { createTempUser } from "../../Repositories/mqttRepo/mqttDynamicSecurity.js";
-import { fetchBikes, fetchTripsByBike } from "../../Controllers/DashboardController.js";
+import { fetchAlerts, fetchBikes, fetchTelemetryByBike, fetchTripsByBike } from "../../Controllers/DashboardController.js";
 
 
 export const dashboardNonAuthenticationRouter: Router = express.Router();
@@ -21,5 +21,15 @@ dashboardNonAuthenticationRouter.get("/trips/:bikeId", (request: Request, respon
     fetchTripsByBike(customerRequest, response)
 });
 
+dashboardNonAuthenticationRouter.get("/telemetry/:bikeId", (request: Request, response: Response, next: NextFunction) => {
+    const customerRequest: CustomRequest = request as CustomRequest
+    fetchTelemetryByBike(customerRequest, response)
+});
+
+
+dashboardNonAuthenticationRouter.get("/alerts", (request: Request, response: Response, next: NextFunction) => {
+    const customerRequest: CustomRequest = request as CustomRequest
+    fetchAlerts(customerRequest, response)
+});
 
 
