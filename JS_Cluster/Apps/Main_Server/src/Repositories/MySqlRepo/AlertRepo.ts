@@ -1,6 +1,7 @@
 import { RowDataPacket } from "mysql2";
 import { pool } from "../../MySqlConfig.js";
 import { SortDirection } from "../../Controllers/DashboardController.js";
+import { Response_DashboardGetAlertsDTO } from "@trungthao/admin_dashboard_dto";
 
 
 
@@ -36,13 +37,7 @@ export interface GetAlertsOptions {
   pageSize?: number;        // default: 10, max: 10
 }
 
-export interface GetAlertsResult {
-  alerts: Alert[];
-  page: number;
-  pageSize: number;
-  total: number;
-  totalPages: number;
-}
+
 
 /**
  * Returns a paginated list of alerts (max 10 per page),
@@ -51,7 +46,7 @@ export interface GetAlertsResult {
  */
 export async function getAlerts(
   options: GetAlertsOptions = {}
-): Promise<GetAlertsResult> {
+): Promise<Response_DashboardGetAlertsDTO> {
   const {
     bikeId,
     from,

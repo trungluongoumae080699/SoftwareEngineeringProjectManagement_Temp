@@ -96,13 +96,7 @@ export interface GetBikeTelemetryOptions {
   sortDirection?: SortDirection; // default "desc" (latest first)
 }
 
-export interface GetBikeTelemetryResult {
-  data: BikeTelemetry[];
-  page: number;
-  pageSize: number;
-  total: number;
-  totalPages: number;
-}
+
 
 export const fetchTelemetryByBike = async (
   request: CustomRequest<
@@ -162,6 +156,7 @@ export const fetchTelemetryByBike = async (
 
   return response.json(result);
 };
+
 
 type AlertQuery = {
   bikeId?: string;

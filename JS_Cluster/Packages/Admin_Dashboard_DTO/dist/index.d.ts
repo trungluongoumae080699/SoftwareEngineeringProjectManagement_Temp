@@ -5,3 +5,6 @@ export * from './Responses/Response_DashboardLogInDTO.js';
 export * from './Models/BikeUpdates.js';
 export * from './Models/Bike.js';
 export * from './Models/Trip.js';
+export * from './Responses/Response_DashboardGetBikeTelemetry.js';
+export * from './Responses/Response_DashboardGeTripsByBike.js';
+export * from './Responses/Response_DashboardGetAlertsDTO.js';

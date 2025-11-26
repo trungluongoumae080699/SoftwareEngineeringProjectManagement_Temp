@@ -5,7 +5,7 @@ import crypto from "crypto";
 
 import { pool } from "../../MySqlConfig.js";
 import { Response_MyTripsListingDTO, Response_TripDTO } from "@trungthao/mobile_app_dto";
-import { Trip, TripStatus } from "@trungthao/admin_dashboard_dto";
+import { Response_DashboardGetTripsByBikeDTO, Trip, TripStatus } from "@trungthao/admin_dashboard_dto";
 import { GetTripsOptions } from "../../Controllers/DashboardController.js";
 
 
@@ -162,15 +162,6 @@ interface TripRow extends RowDataPacket {
 }
 
 
-
-export interface GetTripsResult {
-  trips: Trip[];
-  page: number;
-  pageSize: number;
-  total: number;
-  totalPages: number;
-}
-
 function mapTripRow(row: TripRow): Trip {
   return {
     id: row.id,
@@ -198,7 +189,7 @@ function mapTripRow(row: TripRow): Trip {
 
 export async function getTrips(
   options: GetTripsOptions = {}
-): Promise<GetTripsResult> {
+): Promise<Response_DashboardGetTripsByBikeDTO> {
   const {
     bikeId,
     status,
