@@ -1,10 +1,8 @@
 // // src/App.tsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Sidebar from "./components/Sidebar";
 import Dashboard from "./Dashboard";
 import Bikes from "./Bikes";
 import BikeDetails from "./BikeDetails";
-import Header from "./components/Header";
 import { useState } from "react";
 import Login from "./Login";
 import SignUp from "./SignUp";

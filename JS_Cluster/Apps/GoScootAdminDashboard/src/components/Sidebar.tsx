@@ -13,7 +13,7 @@ import {
 } from "react-icons/md";
 import "./Sidebar.css";
 import { Link, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 /** Configuration for navigation menu items */
 const menuItems = [
