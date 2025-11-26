@@ -98,7 +98,7 @@ function BikeDetails({ onNavigate }: BikeDetailsProps) {
     <div className="bike-details-container">
       <Header title="Bike Details" />
       <div className="main-content">
-        <Sidebar onNavigate={onNavigate} activePage="bike-detail" />
+        <Sidebar />
 
         {/* Content Area */}
         <div className="content-area">
