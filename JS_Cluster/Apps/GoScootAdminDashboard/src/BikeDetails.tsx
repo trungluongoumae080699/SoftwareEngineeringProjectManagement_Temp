@@ -1,84 +1,148 @@
-
-
-import { useState, useRef } from 'react';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { MdBatteryFull } from 'react-icons/md';
-import { getVehicleById } from './vehicleAnimation';
-import { useMapAnimation } from './hooks/useMapAnimation';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import mapboxgl from 'mapbox-gl';
+import { Bike, Trip, BikeTelemetry, BikeStatus, BikeUpdate } from '@trungthao/admin_dashboard_dto';
+import { bikeApi, tripApi } from './services/apiClient';
+import { useWebSocket } from './hooks/useWebSocket';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
+import BikeInfoCard from './components/bikeDetails/BikeInfoCard';
+import TripsTable from './components/bikeDetails/TripsTable';
+import TelemetryTable from './components/bikeDetails/TelemetryTable';
+import BikeMap from './components/bikeDetails/BikeMap';
 import './BikeDetails.css';
 
-/** Default bike location (Saigon center) */
-const BIKE_LOCATION: [number, number] = [106.6297, 10.8231];
+const DEFAULT_BIKE_ID = 'bike-vin-123456';
 
 /** Props for BikeDetails component */
 interface BikeDetailsProps {
   /** Callback to navigate to other pages, optionally with bike location */
   onNavigate: (page: string, bikeLocation?: [number, number]) => void;
+  /** Optional bike ID to display */
+  bikeId?: string;
 }
-
-/** Mock trip data - will be replaced with API data in production */
-const trips = Array(6).fill(null).map((_, i) => ({
-  id: i + 1,
-  customerId: '123456789',
-  dateRange: '1/11/2025 - 2/11/2025',
-}));
-
-/** Mock movement history data - will be replaced with API data in production */
-const movementHistory = Array(8).fill(null).map((_, i) => {
-  const date = new Date(2025, 0, 21 + i, 10 + i, 30 + i * 5);
-  return {
-    id: i + 1,
-    batteryStatus: `${100 - i * 5}%`,
-    location: `106.${6297 + i * 10}, 10.${8231 + i * 5}`,
-    timestamp: date.toISOString().replace('T', ' ').substring(0, 19),
-  };
-});
 
 /**
  * BikeDetails component
- * Main page showing comprehensive bike information and live tracking
+ * Fetches and displays bike data from server
  */
-function BikeDetails({ onNavigate }: BikeDetailsProps) {
-  // Track which trip is selected in the table
-  const [selectedTrip, setSelectedTrip] = useState<number | null>(null);
+function BikeDetails({ onNavigate, bikeId = DEFAULT_BIKE_ID }: BikeDetailsProps) {
+  // Bike data state
+  const [bike, setBike] = useState<Bike | null>(null);
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [telemetry, setTelemetry] = useState<BikeTelemetry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
-  // Date filter state for movement history
+  // UI state
+  const [selectedTrip, setSelectedTrip] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   
-  // Reference to map container DOM element
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  
-  // Initialize map with all vehicles (bike + scooters)
-  const vehiclesRef = useMapAnimation(mapContainerRef, BIKE_LOCATION, 14, BIKE_LOCATION, false);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const markerRef = useRef<mapboxgl.Marker | null>(null);
 
-  // Filter movement history by date range
-  const filteredMovementHistory = movementHistory.filter((movement) => {
+  // WebSocket for real-time updates
+  const handleBikeUpdate = useCallback((bikes: BikeUpdate[]) => {
+    // Find updates for this specific bike
+    const bikeUpdate = bikes.find(b => b.id === bikeId);
+    if (!bikeUpdate) return;
+
+    console.log(`🔄 Real-time update for bike ${bikeId}:`, bikeUpdate);
+
+    // Update bike battery status in real-time
+    if (bike) {
+      setBike(prev => prev ? {
+        ...prev,
+        battery_status: bikeUpdate.battery_status
+      } : null);
+    }
+
+    // Update marker position on map
+    if (markerRef.current && mapRef.current) {
+      const newPosition: [number, number] = [bikeUpdate.longitude, bikeUpdate.latitude];
+      markerRef.current.setLngLat(newPosition);
+
+      // Update marker color based on battery
+      const markerElement = markerRef.current.getElement();
+      if (markerElement) {
+        markerElement.style.backgroundColor = bikeUpdate.battery_status > 20 ? '#4CAF50' : '#F44336';
+      }
+
+      // Update popup content
+      const popup = markerRef.current.getPopup();
+      if (popup) {
+        popup.setHTML(
+          `<strong>${bike?.name || bikeId}</strong><br/>Battery: ${bikeUpdate.battery_status}%`
+        );
+      }
+    }
+
+    // Add new telemetry record to the beginning of the list
+    const newTelemetry: BikeTelemetry = {
+      id: `live-${Date.now()}`,
+      bike_id: bikeId,
+      longitude: bikeUpdate.longitude,
+      latitude: bikeUpdate.latitude,
+      battery: bikeUpdate.battery_status,
+      time: Date.now(),
+    };
+
+    setTelemetry(prev => [newTelemetry, ...prev.slice(0, 99)]); // Keep last 100 records
+  }, [bikeId, bike]);
+
+  useWebSocket(handleBikeUpdate, mapRef.current);
+
+  useEffect(() => {
+    const fetchBikeData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [bikeData, tripsData, telemetryData] = await Promise.all([
+          bikeApi.getBikeById(bikeId),
+          tripApi.getTripsByBike(bikeId),
+          bikeApi.getBikeTelemetry(bikeId, 1, 100),
+        ]);
+
+        setBike(bikeData);
+        setTrips(tripsData);
+        setTelemetry(telemetryData);
+      } catch (err) {
+        console.error('Failed to fetch bike data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load bike data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBikeData();
+  }, [bikeId]);
+
+  // Filter telemetry by date range
+  const filteredTelemetry = telemetry.filter((t) => {
     if (!startDate && !endDate) return true;
     
-    const movementDate = new Date(movement.timestamp);
+    const telemetryDate = new Date(t.time);
     const start = startDate ? new Date(startDate) : null;
     const end = endDate ? new Date(endDate) : null;
     
     if (start && end) {
-      return movementDate >= start && movementDate <= end;
+      return telemetryDate >= start && telemetryDate <= end;
     } else if (start) {
-      return movementDate >= start;
+      return telemetryDate >= start;
     } else if (end) {
-      return movementDate <= end;
+      return telemetryDate <= end;
     }
     return true;
   });
 
-  // Export movement history to CSV
-  const exportToCSV = () => {
-    const headers = ['Battery Status', 'Long - Lat', 'Timestamp'];
+  // Export telemetry to CSV
+  const exportToCSV = useCallback(() => {
+    const headers = ['Battery', 'Longitude', 'Latitude', 'Timestamp'];
     const csvContent = [
       headers.join(','),
-      ...filteredMovementHistory.map(m => 
-        `${m.batteryStatus},"${m.location}",${m.timestamp}`
+      ...filteredTelemetry.map(t => 
+        `${t.battery},${t.longitude},${t.latitude},${new Date(t.time).toISOString()}`
       )
     ].join('\n');
     
@@ -87,133 +151,135 @@ function BikeDetails({ onNavigate }: BikeDetailsProps) {
     const url = URL.createObjectURL(blob);
     
     link.setAttribute('href', url);
-    link.setAttribute('download', `movement-history-${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `bike-${bikeId}-telemetry-${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
+  }, [filteredTelemetry, bikeId]);
 
-  return (
-    <div className="bike-details-container">
-      <Header title="Bike Details" />
-      <div className="main-content">
-        <Sidebar />
+  const formatDate = useCallback((timestamp: number) => {
+    return new Date(timestamp).toLocaleString();
+  }, []);
 
-        {/* Content Area */}
-        <div className="content-area">
-          {/* Bike Info Section */}
-          <div className="bike-info-section">
-            <div className="bike-image">
-              <img src="/bike_type.png" alt="Scooter" />
-            </div>
-            <div className="bike-details">
-              <h2 className="vin-number">VIN-123456</h2>
-              <p className="bike-model">VINFAST EVO200</p>
-              <div className="battery-status">
-                <MdBatteryFull className="battery-icon" size={24} />
-                <span>100%</span>
-              </div>
-              <div className="status-badge">Being Rent</div>
-            </div>
-          </div>
+  const getStatusText = useCallback((status: BikeStatus) => {
+    switch (status) {
+      case BikeStatus.INUSE:
+        return 'In Use';
+      case BikeStatus.RESERVED:
+        return 'Reserved';
+      case BikeStatus.IDLE:
+        return 'Available';
+      default:
+        return status;
+    }
+  }, []);
 
-          {/* Last Trips and Map Section */}
-          <div className="trips-map-section">
-            {/* Trips Table */}
-            <div className="trips-table-container">
-              <h3>Last Trips</h3>
-              <table className="trips-table">
-                <thead>
-                  <tr>
-                    <th>Customer's ID</th>
-                    <th>Date Range</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {trips.map((trip) => (
-                    <tr
-                      key={trip.id}
-                      className={selectedTrip === trip.id ? 'selected' : ''}
-                      onClick={() => setSelectedTrip(trip.id)}
-                    >
-                      <td>{trip.customerId}</td>
-                      <td>{trip.dateRange}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+  const handleMapClick = useCallback(() => {
+    if (telemetry.length > 0) {
+      const latest = telemetry[0];
+      onNavigate('/', [latest.longitude, latest.latitude]);
+    }
+  }, [telemetry, onNavigate]);
 
-            {/* Map */}
-            <div 
-              className="map-container" 
-              onClick={() => onNavigate('map', getVehicleById(vehiclesRef.current, 'bike-vin-123456')?.position || BIKE_LOCATION)}
-              style={{ cursor: 'pointer' }}
-              title="Click to view full map"
-            >
-              <div ref={mapContainerRef} className="trip-map" />
-            </div>
-          </div>
-
-          {/* Movement History Section */}
-          <div className="movement-history-section">
-            <div className="movement-history-header">
-              <h3>Movement History</h3>
-              <div className="movement-history-controls">
-                <div className="date-filters">
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    placeholder="Start Date"
-                    className="date-input"
-                  />
-                  <span>to</span>
-                  <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    placeholder="End Date"
-                    className="date-input"
-                  />
-                </div>
-                <button onClick={exportToCSV} className="export-btn">
-                  Export CSV
-                </button>
-              </div>
-            </div>
-            <table className="trips-table">
-              <thead>
-                <tr>
-                  <th>Battery Status</th>
-                  <th>Long - Lat</th>
-                  <th>Timestamp</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredMovementHistory.length > 0 ? (
-                  filteredMovementHistory.map((movement) => (
-                    <tr key={movement.id}>
-                      <td>{movement.batteryStatus}</td>
-                      <td>{movement.location}</td>
-                      <td>{movement.timestamp}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={3} style={{ textAlign: 'center', padding: '2rem' }}>
-                      No movement history found for the selected date range
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+  if (loading) {
+    return (
+      <div className="bike-details-container">
+        <Header title="Bike Details" />
+        <div className="main-content">
+          <Sidebar />
+          <div className="content-area" style={{ padding: '20px', textAlign: 'center' }}>
+            <p>Loading bike details...</p>
           </div>
         </div>
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bike-details-container">
+        <Header title="Bike Details" />
+        <div className="main-content">
+          <Sidebar />
+          <div className="content-area" style={{ padding: '20px' }}>
+            <div className="error-message" style={{ color: 'red', padding: '20px', background: '#fee', borderRadius: '8px' }}>
+              <h3>Error Loading Bike Data</h3>
+              <p>{error}</p>
+              <button onClick={() => window.location.reload()} style={{ marginTop: '10px', padding: '8px 16px' }}>
+                Retry
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!bike) {
+    return (
+      <div className="bike-details-container">
+        <Header title="Bike Details" />
+        <div className="main-content">
+          <Sidebar />
+          <div className="content-area" style={{ padding: '20px' }}>
+            <p>Bike not found</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+
+    <div className="bike-details-container">
+
+      <Header title="Bike Details" />
+
+      <div className="main-content">
+
+        <Sidebar />
+
+        <div className="content-area">
+          <BikeInfoCard 
+            bike={bike} 
+            formatDate={formatDate} 
+            getStatusText={getStatusText} 
+          />
+
+          <div className="trips-map-section">
+            <TripsTable 
+              trips={trips}
+              selectedTrip={selectedTrip}
+              onTripSelect={setSelectedTrip}
+              formatDate={formatDate}
+            />
+            <BikeMap 
+              bike={bike}
+              telemetry={telemetry}
+              onMapClick={handleMapClick}
+            />
+          </div>
+
+          <TelemetryTable 
+            telemetry={filteredTelemetry}
+            startDate={startDate}
+            endDate={endDate}
+            onStartDateChange={setStartDate}
+            onEndDateChange={setEndDate}
+            onExportCSV={exportToCSV}
+            formatDate={formatDate}
+          />
+        </div>
+
+      </div>
+
     </div>
+
   );
+
 }
+
+
 
 export default BikeDetails;
