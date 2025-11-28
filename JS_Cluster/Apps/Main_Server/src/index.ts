@@ -12,6 +12,8 @@ import { requestPreProcession } from "./Middlewares/RequestPreProcession.js";
 import { mobileAppNonAuthRouter } from "./Routes/MobileAppRouters/MobileAppNonAuthRouter.js";
 import { authorize } from "./Middlewares/Authorization.js";
 import { LogInType } from "./Repositories/RedisRepo/SessionRepo.js";
+import { initMqtt } from "./MqttConfig.js";
+import { dashboardNonAuthenticationRouter } from "./Routes/DashboardRouters/DashboardNonAuthenticationRoutes.js";
 
 
 const app: Application = express();
@@ -32,6 +34,7 @@ async function startServer() {
   try {
     await initRedis()
     await checkMySQL();
+    await initMqtt()
 
     const server = http.createServer(app);
     app.use(requestPreProcession())
@@ -41,6 +44,7 @@ async function startServer() {
     app.use("/app/auth", mobileAppAuthenticationRouter);
     app.use("/dashboard/auth", dashboardAuthenticationRouter)
     app.use("/app", authorize([LogInType.CUSTOMER]), mobileAppNonAuthRouter);
+    app.use("/dashboard", authorize([LogInType.ADMIN]), dashboardNonAuthenticationRouter )
 
     /** 404 handler (no route matched) */
     app.use((req: Request, res: Response) => {

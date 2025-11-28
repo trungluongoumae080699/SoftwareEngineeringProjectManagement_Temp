@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import { promises as fs } from "fs";
 import mysql from "mysql2/promise";
+import bcrypt from "bcrypt";
 
 dotenv.config({ path: ".env.admin" });
 
@@ -56,14 +57,25 @@ async function insertStaffFromJsonBulk() {
   const raw = await fs.readFile("src/Assets/staff.json", "utf8");
   const staffList: StaffSeed[] = JSON.parse(raw);
 
+
   if (!Array.isArray(staffList) || staffList.length === 0) {
     console.log("⚠️ staff.json is empty or not an array, nothing to insert.");
     return;
   }
 
+  console.log("🔐 Hashing passwords using bcrypt...");
+    const saltRounds = 10;
+  
+    const hashedStaff = await Promise.all(
+      staffList.map(async (c) => ({
+        ...c,
+        password: await bcrypt.hash(c.password, saltRounds),
+      }))
+    );
+
   console.log(`📦 Loaded ${staffList.length} staff entries from staff.json`);
 
-  const placeholders = staffList.map(() => "(?, ?, ?, ?, ?)").join(", ");
+  const placeholders = hashedStaff.map(() => "(?, ?, ?, ?, ?)").join(", ");
 
   const sql = `
     INSERT INTO staff (
@@ -77,7 +89,7 @@ async function insertStaffFromJsonBulk() {
   `;
 
   const values: any[] = [];
-  for (const s of staffList) {
+  for (const s of hashedStaff) {
     values.push(
       s.id,
       s.full_name,

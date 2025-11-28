@@ -11,6 +11,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "node --test",
+    "db:create_bike_user": "node --loader ts-node/esm ./src/scripts/mqtt/create_bike_user.ts",
     "db:bike_loc_json_gen": "node --loader ts-node/esm ./src/scripts/json_sample_data_gen/create_idling_bikes_loc_json.ts",
     "db:insert_hubs": "node --loader ts-node/esm ./src/scripts/sql_migration/insert_hubs.ts",
     "db:insert_bikes": "node --loader ts-node/esm src/scripts/sql_migration/insert_bikes.ts",
@@ -21,6 +22,7 @@
     "db:all": "npm run db:insert_hubs && npm run db:insert_bikes && npm run db:insert_staff && npm run db:insert_customers && npm run db:insert_trips && npm run db:update_bikes_names"
   },
   "dependencies": {
+    "@clickhouse/client": "^1.14.0",
     "@faker-js/faker": "^10.1.0",
     "@trungthao/admin_dashboard_dto": "*",
     "@trungthao/mobile_app_dto": "*",
@@ -30,6 +32,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.0.0",
     "jsonwebtoken": "^9.0.0",
+    "mqtt": "^5.14.1",
     "mysql2": "^3.11.0",
     "redis": "^4.7.1"
   },
@@ -39,6 +42,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.6",
+    "@types/mqtt": "^0.0.34",
     "@types/node": "^22.19.1",
     "@types/redis": "^4.0.10",
     "ts-node": "^10.9.2",

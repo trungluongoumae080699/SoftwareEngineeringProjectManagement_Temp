@@ -5,7 +5,7 @@ export enum MobileAppBikeType {
     BIKE = "bike"
 }
 
-export type MobileAppBike = {
+export interface MobileAppBike  {
     id: string,
     name: string,
     battery_status?: number | null,

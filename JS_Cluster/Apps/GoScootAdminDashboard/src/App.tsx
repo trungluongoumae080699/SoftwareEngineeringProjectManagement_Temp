@@ -1,19 +1,21 @@
+// // src/App.tsx
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Dashboard from "./Dashboard";
+import Bikes from "./Bikes";
+import BikeDetails from "./BikeDetails";
+import { useState } from "react";
+import Login from "./Login";
+import SignUp from "./SignUp";
 
-
-import { useState } from 'react';
-import Map from './Map';
-import BikeDetails from './BikeDetails';
-
-/**
- * Main App component
- * Manages application state and page routing
- */
 function App() {
+  const [pageTitle, setPageTitle] = useState("");
   // Track current page (simple client-side routing)
-  const [currentPage, setCurrentPage] = useState<string>('bike-detail');
-  
+  const [currentPage, setCurrentPage] = useState<string>("bike-detail");
+
   // Store bike location when navigating from BikeDetails to Map
-  const [selectedBikeLocation, setSelectedBikeLocation] = useState<[number, number] | null>(null);
+  const [selectedBikeLocation, setSelectedBikeLocation] = useState<
+    [number, number] | null
+  >(null);
 
   /**
    * Handle navigation between pages
@@ -28,17 +30,34 @@ function App() {
   };
 
   return (
-    <>
-      {/* Render Map page */}
-      {currentPage === 'map' && <Map onNavigate={handleNavigate} centerOnLocation={selectedBikeLocation} />}
-      
-      {/* Render Bike Details page */}
-      {currentPage === 'bike-detail' && <BikeDetails onNavigate={handleNavigate} />}
-      
-      {/* Add other pages here as needed (Trips, Alerts, etc.) */}
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/bikes" element={<Bikes />} />
+        <Route
+          path="/bike-detail"
+          element={<BikeDetails onNavigate={handleNavigate} />}
+        />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+      </Routes>
+    </Router>
   );
 }
 
 export default App;
+// import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+// import Login from './Login';
+// import SignUp from './SignUp';
+// import Map from './Map';
+// import WebSocketTest from './TestingScreens/WebSocketTestPage';
 
+// function App() {
+//   // TODO: Add proper authentication state management
+//   const isAuthenticated = false;
+
+//   return (
+//     <WebSocketTest></WebSocketTest>
+
+//   );
+// }

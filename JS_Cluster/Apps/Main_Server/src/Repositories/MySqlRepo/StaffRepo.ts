@@ -18,3 +18,20 @@ export async function getStaffByEmail(email: string): Promise<Staff | null> {
   const row = rows[0];
   return row
 }
+
+export async function getStaffById(id: string): Promise<Staff | null> {
+  const [rows] = await pool.query<Staff[]>(
+    `
+    SELECT id, full_name, email, password, created_at
+    FROM staff
+    WHERE id = ?
+    LIMIT 1
+    `,
+    [id]
+  );
+
+  if (rows.length === 0) return null;
+
+  const row = rows[0];
+  return row
+}
