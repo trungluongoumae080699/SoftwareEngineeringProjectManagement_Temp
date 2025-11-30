@@ -21,7 +21,6 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
 
     try {
       const response = await signIn({ email, password });
-      console.log('Login successful:', response.staffProfile);
       
       // Notify App that login succeeded
       onLoginSuccess?.();

@@ -47,21 +47,17 @@ function App() {
    */
   useEffect(() => {
     const checkExistingSession = async () => {
-      console.log('🔍 Checking for existing session...');
       
       try {
         // Try formless sign-in if session ID exists
         const response = await formlessSignIn();
         
         if (response) {
-          console.log('✅ Session restored for:', response.staffProfile.email);
           setIsAuth(true);
         } else {
-          console.log('ℹ️ No valid session, user needs to log in');
           setIsAuth(false);
         }
       } catch (error) {
-        console.error('❌ Session check failed:', error);
         setIsAuth(false);
       } finally {
         setIsCheckingAuth(false);

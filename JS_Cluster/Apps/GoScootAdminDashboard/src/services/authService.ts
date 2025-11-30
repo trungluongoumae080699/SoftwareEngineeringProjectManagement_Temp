@@ -161,12 +161,6 @@ export async function signIn(credentials: Request_DashboardLogInDTO): Promise<Re
   
   // Store credentials securely
   storeCredentials(data);
-  
-  console.log('✅ Sign in successful, session ID stored');
-  if (data.mqtt_password) {
-    console.log('✅ MQTT password received and stored in memory');
-  }
-
   return data;
 }
 
@@ -180,7 +174,6 @@ export async function formlessSignIn(): Promise<Response_DashboardLogInDTO | nul
   const sessionId = getSessionId();
   
   if (!sessionId) {
-    console.log('ℹ️ No stored session ID, user needs to log in');
     return null;
   }
 
@@ -207,15 +200,9 @@ export async function formlessSignIn(): Promise<Response_DashboardLogInDTO | nul
     
     // Update stored credentials (session ID might be refreshed)
     storeCredentials(data);
-    
-    console.log('✅ Formless sign in successful, session restored');
-    if (data.mqtt_password) {
-      console.log('✅ MQTT password received and stored in memory');
-    }
 
     return data;
   } catch (error) {
-    console.error('❌ Formless sign in error:', error);
     // Clear invalid session on error
     clearAuth();
     return null;

@@ -61,6 +61,19 @@
   font-size: 0.9rem;
 }
 
+.filter-select {
+  border: none;
+  outline: none;
+  font-size: 0.9rem;
+  background: transparent;
+  cursor: pointer;
+  min-width: 100px;
+}
+
+.filter-select:focus {
+  outline: none;
+}
+
 .filter-input::-webkit-outer-spin-button,
 .filter-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -182,6 +195,29 @@
   margin: 0 1rem;
   font-size: 0.95rem;
   color: #666;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.page-input {
+  width: 50px;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.page-input:focus {
+  outline: none;
+  border-color: #C85A28;
+}
+
+.total-bikes {
+  margin-left: 1rem;
+  font-size: 0.9rem;
+  color: #888;
 }
 
 /* Loading and Error States */
@@ -190,6 +226,16 @@
   padding: 3rem;
   font-size: 1.2rem;
   color: #666;
+}
+
+.loading-progress {
+  background: #e8f4fd;
+  color: #1976d2;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
 }
 
 .error-message {
