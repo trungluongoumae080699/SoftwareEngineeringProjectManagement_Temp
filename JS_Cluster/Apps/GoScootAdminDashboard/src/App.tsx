@@ -1,11 +1,13 @@
 // // src/App.tsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./Dashboard";
 import Bikes from "./Bikes";
 import BikeDetails from "./BikeDetails";
 import { useState } from "react";
 import Login from "./Login";
 import SignUp from "./SignUp";
+import Alerts from "./Alert";
 
 function App() {
   const [pageTitle, setPageTitle] = useState("");
@@ -32,12 +34,17 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/bikes" element={<Bikes />} />
+        <Route path="/" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
+        <Route path="/bikes" element={<ProtectedRoute><Bikes /></ProtectedRoute>} />
         <Route
           path="/bike-detail"
-          element={<BikeDetails onNavigate={handleNavigate} />}
+          element={<ProtectedRoute><BikeDetails onNavigate={handleNavigate} /></ProtectedRoute>}
         />
+        <Route path="/alert" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
       </Routes>
